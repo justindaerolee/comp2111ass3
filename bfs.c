@@ -11,6 +11,7 @@ typedef struct llist {
 
 // change to c code.
 void search (Tree root, unsigned int N, Key key, T *val, RetVal *found) {
+	int n = 0;
 	llist q = (llist*)malloc(sizeof(llist));;
 	q.add(root);
 	while (n != 0 && *found == 0) {
@@ -22,6 +23,7 @@ void search (Tree root, unsigned int N, Key key, T *val, RetVal *found) {
 		} else {
 			for child in children :
 				q.add(child);
+				n ++;
 		}
 	}
 }
