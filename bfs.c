@@ -13,7 +13,7 @@ void search (Tree root, unsigned int N, Key key, T *val, RetVal *found) {
 	while (n != 0 && *found == 0) {
 		Tree tmp = q.dequeue();
 		n --;
-		if (q->t->key == key) {
+		if (q->t->id == key) {
 			*found = 1;
 			*val = q->t->val;
 		} else {
