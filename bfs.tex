@@ -13,7 +13,7 @@
 \title{Derivation of $\bfs$\\
 \large COMP2111 assignment 3}
 %
-\author{Dae Ro Lee z5060887 and Wing Feng z11111111}
+\author{Dae Ro Lee z5060887 and Wing Feng z5091907}
 \allowdisplaybreaks
 %
 \begin{document}
@@ -53,4 +53,29 @@ The derivation of $\bfs$ on a tree using a bounded $\qu$.
     \end{array}
   \right]}{(2)}}\\
 \end{align*}
+
+%---the following are format for invariant, can be moved to correct position later
+To help define the loop invariant, we define expression $path(t,r_t,x)$ as:\\
+\begin{align*}
+{\exists n, x \in \Gamma^{n}_{t}(r_t) }\\
+\end{align*}
+which means node x is reachable in tree t \\
+\break
+ We define the loop invariant for $\bfs$ as:\\
+\begin{align*}
+    {I:=\left[
+      \begin{array}{l}
+       % the visited here means the visited set which should be introduced before
+       \Not f\left(
+	   \begin{array}{l}
+		  \forall x\in visited \cup q, path(t,r_t,x)\\
+		  \And~\forall x \in visited, k_t(x)\neq k\\
+		  \And~\Gamma_{t}(x) \subseteq visited \cup q
+	    \end{array}
+		\right )\\
+      \Or (f\implies\exists x (k_t(x)=k \And \lambda_t(x)=v \And path(t,r_t,x)))
+      \end{array}
+    \right]}\\
+\end{align*}
+%---
 \end{document}
