@@ -53,7 +53,6 @@ The derivation of $\bfs$ on a tree using a bounded $\qu$.
     \end{array}
   \right]}{(2)}}\\
 \end{align*}
-
 %---the following are format for invariant, can be moved to correct position later
 To help define the loop invariant, we define expression $path(t,r_t,x)$ as:\\
 \begin{align*}
@@ -78,14 +77,21 @@ which means node x is reachable in tree t \\
     \right]}\\
 \end{align*}
 %---
-
-%
+Define the following queue operation:\\
+\textbf{initialise:} initialise a queue that can hold up to \textit{N} elements to the empty queue vlaue.\\
+\break
+\textbf{enqueue:} adds an item to a queue if there's a space available \\
 \begin{align*}
-  &\PROC~enq(q, \VALUE~v,n)\cdot{}\\
+  &\PROC~enqueue(q, \VALUE~v,n)\cdot{}\\
     &\qquad n,q:[n<N \And q=q_0\And q \neq <>,q=q_0\cup\{v\}]\\
 %
   \refstep{\textbf{}}
   {}
 \end{align*}
+%
+\textbf{dequeue:} return the oldest item in the queue and remove it form the queue\\
+\break
+\textbf{isempty:} return whether a queue is empty\\
+\break
 
 \end{document}
