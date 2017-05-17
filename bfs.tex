@@ -54,33 +54,29 @@ The derivation of $\bfs$ on a tree using a bounded $\qu$.
   \right]}{(2)}}\\
 \end{align*}
 %---the following are format for invariant, can be moved to correct position later
-To help define the loop invariant, we define expression $path(t,r_t,x)$ as:\\
-\begin{align*}
-{\exists n, x \in \Gamma^{n}_{t}(r_t) }\\
-\end{align*}
-which means node x is reachable in tree t \\
-\break
  We define the loop invariant for $\bfs$ as:\\
 \begin{align*}
-    {I:=\left[
+    {I:=\left(
       \begin{array}{l}
        % the visited here means the visited set which should be introduced before
-       \Not f\left(
-	   \begin{array}{l}
-		  \forall x\in visited \cup q, path(t,r_t,x)\\
-		  \And~\forall x \in visited, k_t(x)\neq k\\
-		  \And~\Gamma_{t}(x) \subseteq visited \cup q
-	    \end{array}
-		\right )\\
-      \Or (f\implies\exists x (k_t(x)=k \And \lambda_t(x)=v \And path(t,r_t,x)))
-      \end{array}
-    \right]}\\
+      \left(
+	  \begin{array}{I}
+		\Not f \And 0 \leqslant n \leqslant N \And K_t(tmp) \neq k\\
+		\Or (f\And  K_t(tmp) = k \And \lambda_t(tmp) = v)
+        \end{array}
+	  	\right)\\
+     	 \And \forall x\in V_t(x\in \Gamma^{*}_{t}(r_t)\And x \notin\Gamma^{+}_{t}(x))
+	\end{array}
+    \right)}\\
 \end{align*}
 %---
 Define the following queue operation:\\
-\textbf{initialise:} initialise a queue that can hold up to \textit{N} elements to the empty queue vlaue.\\
+\textbf{initialise:} initialise a queue that can hold up to \textit{N} elements to the empty queue vlaue.
+\begin{align*}
+  &\PROC~initialise(N,\RETURN q)\cdot{}\\
+\end{align*}
 \break
-\textbf{enqueue:} adds an item to a queue if there's a space available \\
+\textbf{enqueue:} adds an item to a queue if there's a space available 
 \begin{align*}
   &\PROC~enqueue(q, \VALUE~v,n)\cdot{}\\
     &\qquad n,q:[n<N \And q=q_0\And q \neq <>,q=q_0\cup\{v\}]\\
@@ -91,7 +87,11 @@ Define the following queue operation:\\
 %
 \textbf{dequeue:} return the oldest item in the queue and remove it form the queue\\
 \break
-\textbf{isempty:} return whether a queue is empty\\
+\textbf{isempty:} return whether a queue is empty
+\begin{align*}
+  &\PROC~isempty(n, \RETURN f)\cdot{}\\
+    &\qquad {n,f:[n \in \mathbb{Z^+} ,(\Not f \And n \neq 0)\Or (f \And n = 0)]}\\
+\end{align*}
 \break
 
 \end{document}
