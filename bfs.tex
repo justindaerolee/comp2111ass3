@@ -92,8 +92,18 @@ The derivation of $\bfs$ on a tree using a bounded $\qu$.
 %
 \lrefstep{(6)}{i-loc}	
 {
-	\text{introduce n and tmp}
+	\VAR~tmp\cdot{}\nt{tmp,q,n,v,f:[\pre(3)\And q=<>\And \Not f,I] }{(7)}\\
  }\\			
+ \refstep{\textbf{ass}}
+{
+	q := dequeue()\\
+	& n := 0\\
+}\\
+%
+\lrefstep{(4)}{while}	
+{
+	\WHILE~n \neq 0 \And \Not f ~\DO:
+ }\\		
 \end{align*}
 %---following are queue operation
 Define the following queue operation:\\
