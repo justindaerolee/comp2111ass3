@@ -2,8 +2,6 @@
 \usepackage{nicefrac}
 \usepackage{2111defs2}
 %
-%\newcommand{\sorted}[3]{\mathit{s'ed}(#1[#2..#3])}
-\newcommand{\sort}[3]{\mathit{sort}(#1[#2..#3])}
 \newcommand{\pre}{\mathit{pre}}
 \newcommand{\post}{\mathit{post}}
 \newcommand{\bfs}{\textsc{breath first search}\xspace}
@@ -87,7 +85,7 @@ The derivation of $\bfs$ on a tree using a bounded $\qu$.
 %
 \lrefstep{(5)}{ass}	
 {
-	q := initialise(N);~f := \Not f\\
+	q \Ass initialise(N);~f \Ass \Not f\\
  }\\			
 %
 \lrefstep{(6)}{i-loc}	
@@ -96,37 +94,70 @@ The derivation of $\bfs$ on a tree using a bounded $\qu$.
  }\\			
  \refstep{\textbf{ass}}
 {
-	q := dequeue()\\
-	& n := 0\\
+	q \Ass <r_t>\\
+	& n \Ass 1\\
 }\\
 %
-\lrefstep{(4)}{while}	
+\lrefstep{(4)}{\textbf{s-post}}
+{q,n:[I\And~g, I\And (f \Or~ q=<>)]}\\
+%
+\refstep{\textbf{\WHILE}}	
 {
-	\WHILE~n \neq 0 \And \Not f ~\DO:
- }\\		
+	\WHILE~n \neq 0 \And \Not f ~\DO\\
+	    &\qquad \nt{q,n:[I\And~g, I]}{8}\\
+	&\OD
+ }\\	
+ \lrefstep{(8)}
+ {\textbf{seq}}
+ {\nt{n,q:[g\And~I\And~q=<z,qt>, q=qt\And tmp=z]}{(a)}\\
+ &;\nt{n,q:[q=qt\And tmp=z, I]}{(b)}}\\
+ \lrefstep{(b)}
+ {\textbf{if}}
+ {\IF~k_t(tmp) = k~\THEN\\
+ &\qquad~\nt{f,v:[\NOT~f\And k_t(tmp) = k, f\And~v=\lambda_t(tmp) ]}{(c)}\\
+ &\ELSE\\
+ &\qquad \nt{[k_t(tmp) \ne k, q= q_0\cdot{}\Gamma~(tmp)]}{(d)}\\
+ &\FI}\\
+%
+\lrefstep{(a)}
+{\textbf{ass}}
+{tmp \Ass dequeue(q,n)}\\
+%
+\lrefstep{(c)}
+{\textbf{ass}}
+{f\Ass true; v = \lambda_t(tmp)}\\
+%
+\lrefstep{(d)}
+{\textbf{ass}}
+{add all children to q}\\
 \end{align*}
+i-loc tmp $\implies$ $k_t(tmp)$ $\ne$ k, $tmp$ is a variable that is not mapped to anything hence $k_t$ does not exist.\\
+$n =1$ after assignment and N is the maximum number of nodes available. hence $pre + blah \implies invariant$. \\
+
 %---following are queue operation
 Define the following queue operation:\\
 \textbf{initialise:} initialise a queue that can hold up to \textit{N} elements to the empty queue vlaue.
 \begin{align*}
   &\PROC~initialise(N,\RETURN q)\cdot{}\\
+  &\qquad q :[true, q = <>]\\
 \end{align*}
 \break
 \textbf{enqueue:} adds an item to a queue if there's a space available 
 \begin{align*}
   &\PROC~enqueue(q, \VALUE~v,n)\cdot{}\\
-    &\qquad n,q:[n<N \And q=q_0\And q \neq <>,q=q_0\cup\{v\}]\\
-%
-  \refstep{\textbf{}}
-  {}
+    &\qquad n,q:[n<N \And q=q_0,q=q_0\cdot{}v n = n_0 + 1]\\
 \end{align*}
 %
 \textbf{dequeue:} return the oldest item in the queue and remove it form the queue\\
+\begin{align*}
+    &\PROC~dequeue(q, n)\cdot{}\\
+    &\qquad n,q:[n>0\And q=<s,qp>\And q\ne~<>, s= s_0\And q = qp] 
+\end{align*}
 \break
 \textbf{isempty:} return whether a queue is empty
 \begin{align*}
-  &\PROC~isempty(n, \RETURN f)\cdot{}\\
-    &\qquad {n,f:[n \in \mathbb{Z^+} ,(\Not f \And n \neq 0)\Or (f \And n = 0)]}\\
+  &\RETURN~isempty(n, \RETURN f)\cdot{}\\
+    &\qquad {n,f:[n = length(q) ,(\Not f \And n \neq 0)\Or (f \And n = 0)]}\\
 \end{align*}
 \break
 
