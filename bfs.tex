@@ -2,8 +2,6 @@
 \usepackage{nicefrac}
 \usepackage{2111defs2}
 %
-%\newcommand{\sorted}[3]{\mathit{s'ed}(#1[#2..#3])}
-\newcommand{\sort}[3]{\mathit{sort}(#1[#2..#3])}
 \newcommand{\pre}{\mathit{pre}}
 \newcommand{\post}{\mathit{post}}
 \newcommand{\bfs}{\textsc{breath first search}\xspace}
@@ -13,7 +11,7 @@
 \title{Derivation of $\bfs$\\
 \large COMP2111 assignment 3}
 %
-\author{Dae Ro Lee z5060887 and Wing Feng z11111111}
+\author{Dae Ro Lee z5060887 and Wing Feng z5091907}
 \allowdisplaybreaks
 %
 \begin{document}
@@ -25,12 +23,13 @@ The derivation of $\bfs$ on a tree using a bounded $\qu$.
 %
 \section{The Derivation}
 \label{sec:derivation}
+%
 \begin{align*}
   &\PROC~\srh(\VALUE~t, \VALUE~N, \VALUE~k, \RESULT~v, \RESULT~f)\cdot{}\\
    &\qquad  \nt{t,N,k,v,f:\left[
     \begin{array}{l}
      \forall x\in V_t(x\in \Gamma^{*}_{t}(r_t)\And x \notin\Gamma^{+}_{t}(x))\And\max_{i\in\mathbb{N}}|\Gamma_t^{i}(r_t)\cup\Gamma_{t}^{i+1}(r_t)|\leq N,\\
-     (f\And\exists w\in V_{t_0}(k_t_0(w)=k_0\And\lambda_{t_0}(w)=v))\Or\\
+     (f\And\exists w\in V_{t_0}(k_{t_0}(w)=k_0\And\lambda_{t_0}(w)=v))\Or\\
      (\Not f\And\forall w\in V_{t_0}(k_{t_0}(w)\neq~k_0))
     \end{array}
   \right]}{(1)}\\
@@ -45,7 +44,7 @@ The derivation of $\bfs$ on a tree using a bounded $\qu$.
     \end{array}
   \right]}\\
   \refstep{\textbf{introduce local variable}}
-  {\VAR~q\cdot{}\nt{q,v,f:\left[
+  {\VAR~q, n\cdot{}\nt{q,n,v,f:\left[
     \begin{array}{l}
      \forall x\in V_t(x\in \Gamma^{*}_{t}(r_t)\And x \notin\Gamma^{+}_{t}(x))\And\max_{i\in\mathbb{N}}|\Gamma_t^{i}(r_t)\cup\Gamma_{t}^{i+1}(r_t)|\leq N,\\
      (f\And\exists w\in V_{t}(k_t(w)=k\And\lambda_t(w)=v))\Or\\
@@ -53,12 +52,113 @@ The derivation of $\bfs$ on a tree using a bounded $\qu$.
     \end{array}
   \right]}{(2)}}\\
 \end{align*}
-%
+%---the following are format for invariant, can be moved to correct position later
+\text We define the loop invariant for $\bfs$ as:\\
 \begin{align*}
-  &\PROC~enq(q, \VALUE~v,n)\cdot{}\\
-    &\qquad n,q:[n<N \And q=q_0\And q \neq <>,q=q_0\cup\{v\}]\\
-%
-  \refstep{\textbf{}}
-  {}
+    {I:=\left(
+      \begin{array}{l}
+       % the visited here means the visited set which should be introduced before
+      \left(
+	  \begin{array}{l}
+		\Not f \And 0 \leqslant n \leqslant N \And K_t(tmp) \neq k\\
+		\Or (f\And  K_t(tmp) = k \And \lambda_t(tmp) = v)
+        \end{array}
+	  	\right)\\
+     	 \And \forall x\in V_t(x\in \Gamma^{*}_{t}(r_t)\And x \notin\Gamma^{+}_{t}(x))
+	\end{array}
+    \right)}\\
 \end{align*}
+%---
+\break
+\begin{align*}
+\lrefstep{(2)}{seq}	
+{
+	\nt{q,n,v,f:[\pre(2), I] }{(3)}\\
+	&;\nt{q,n,v,f:[I, \post(2)] }{(4)}\\
+ }\\			
+%
+\lrefstep{(3)}{seq}	
+{
+	\nt{q,n,v,f:[\pre(3), \pre(3)\And q=<>\And \Not f] }{(5)}\\
+	&;\nt{q,n,v,f:[\pre(3)\And q=<>\And \Not f,I] }{(6)}\\
+ }\\			
+%
+\lrefstep{(5)}{ass}	
+{
+	q \Ass initialise(N);~f \Ass \Not f\\
+ }\\			
+%
+\lrefstep{(6)}{i-loc}	
+{
+	\VAR~tmp\cdot{}\nt{tmp,q,n,v,f:[\pre(3)\And q=<>\And \Not f,I] }{(7)}\\
+ }\\			
+ \refstep{\textbf{ass}}
+{
+	q \Ass <r_t>\\
+	& n \Ass 1\\
+}\\
+%
+\lrefstep{(4)}{\textbf{s-post}}
+{q,n:[I\And~g, I\And (f \Or~ q=<>)]}\\
+%
+\refstep{\textbf{\WHILE}}	
+{
+	\WHILE~n \neq 0 \And \Not f ~\DO\\
+	    &\qquad \nt{q,n:[I\And~g, I]}{8}\\
+	&\OD
+ }\\	
+ \lrefstep{(8)}
+ {\textbf{seq}}
+ {\nt{n,q:[g\And~I\And~q=<z,qt>, q=qt\And tmp=z]}{(a)}\\
+ &;\nt{n,q:[q=qt\And tmp=z, I]}{(b)}}\\
+ \lrefstep{(b)}
+ {\textbf{if}}
+ {\IF~k_t(tmp) = k~\THEN\\
+ &\qquad~\nt{f,v:[\NOT~f\And k_t(tmp) = k, f\And~v=\lambda_t(tmp) ]}{(c)}\\
+ &\ELSE\\
+ &\qquad \nt{[k_t(tmp) \ne k, q= q_0\cdot{}\Gamma~(tmp)]}{(d)}\\
+ &\FI}\\
+%
+\lrefstep{(a)}
+{\textbf{ass}}
+{tmp \Ass dequeue(q,n)}\\
+%
+\lrefstep{(c)}
+{\textbf{ass}}
+{f\Ass true; v = \lambda_t(tmp)}\\
+%
+\lrefstep{(d)}
+{\textbf{ass}}
+{add all children to q}\\
+\end{align*}
+i-loc tmp $\implies$ $k_t(tmp)$ $\ne$ k, $tmp$ is a variable that is not mapped to anything hence $k_t$ does not exist.\\
+$n =1$ after assignment and N is the maximum number of nodes available. hence $pre + blah \implies invariant$. \\
+
+%---following are queue operation
+Define the following queue operation:\\
+\textbf{initialise:} initialise a queue that can hold up to \textit{N} elements to the empty queue vlaue.
+\begin{align*}
+  &\PROC~initialise(N,\RETURN q)\cdot{}\\
+  &\qquad q :[true, q = <>]\\
+\end{align*}
+\break
+\textbf{enqueue:} adds an item to a queue if there's a space available 
+\begin{align*}
+  &\PROC~enqueue(q, \VALUE~v,n)\cdot{}\\
+    &\qquad n,q:[n<N \And q=q_0,q=q_0\cdot{}v n = n_0 + 1]\\
+\end{align*}
+%
+\textbf{dequeue:} return the oldest item in the queue and remove it form the queue\\
+\begin{align*}
+    &\PROC~dequeue(q, n)\cdot{}\\
+    &\qquad n,q:[n>0\And q=<s,qp>\And q\ne~<>, s= s_0\And q = qp] 
+\end{align*}
+\break
+\textbf{isempty:} return whether a queue is empty
+\begin{align*}
+  &\RETURN~isempty(n, \RETURN f)\cdot{}\\
+    &\qquad {n,f:[n = length(q) ,(\Not f \And n \neq 0)\Or (f \And n = 0)]}\\
+\end{align*}
+\break
+
 \end{document}
