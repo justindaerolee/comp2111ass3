@@ -87,7 +87,7 @@ The derivation of $\bfs$ on a tree using a bounded $\qu$.
 %
 \lrefstep{(5)}{ass} 
 {
-  q \Ass initialise(N);~f \Ass \Not f\\
+  q \Ass initialise(N);~f \Ass \False\\
  }\\      
 %
 \lrefstep{(6)}{i-loc} 
@@ -143,13 +143,13 @@ $n =1$ after assignment and N is the maximum number of nodes available. hence $p
 Putting the code together we have
 \begin{align}
     &q\Ass initialise(N)\\
-    &f\Ass \Not f\\
+    &f\Ass \False\\
     &q\Ass <r_t>\\
     &n\Ass 1\\
     &\WHILE~n \ne 0\And \Not f~\DO\\
     &\qquad tmp\Ass dequeue(q,n)\\
     &\qquad \IF~k_t(tmp) = k~\THEN\\
-    &\qquad\qquad f\Ass f\\
+    &\qquad\qquad f\Ass \True\\
     &\qquad\qquad v\Ass \lambda_t(tmp)\\
     &\qquad \ELSE\\
     &\qquad\qquad addAllChildren\\
