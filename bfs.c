@@ -4,32 +4,44 @@
 #include "bbq.h"
 #include "bfs.h"
 
+
 // change to c code.
 void search (Tree root, unsigned int N, Key key, T *val, RetVal *found) {
     //initialisation
-    List *q = (List*)malloc(sizeof(List));
-    int n = 0;
-    
-    // add first node
-    q->n = root;
-    q->next = NULL;
-    n ++;
-    //
-    while (n != 0 && *found == 0) {
+    //(1)and(5)
+    List q[N];
+    int n;
+    *found = Failure;
+    //(6)
+    Tree tmp;
+    List head;
+    head->n = root;
+    head->next = NULL;
+    q[0] = head;
+    n = 1;
+    //not shown in the tex file
+    int a, b = 0;
+    //(4) while loop
+    while (n != 0 && *found == Failure) {
+    	//(8)(a)
         //dequeue
-        Tree tmp = q->n;
-        q = q->next;
-        n --;
+        tmp = q[a]->n;
+        a ++;
+        n --;//do n--/n++ or n = b-a+1?
+        //(8)(b)
         // if found no need to continue the search
         if (tmp->id == key) {
-            *found = 1;
+        	//(8)(c)
+            *found = Success;
             *val = tmp->val;
         } else {
+        	//(8)(d)
             // else add all the children of the tmp tree.
             List *children = tmp->list;
             while (children != NULL) {
                 add(q, children, n);
-                n++
+                b++;
+                n++;
                 children = children->next;
             }
         }
