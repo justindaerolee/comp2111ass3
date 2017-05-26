@@ -1,8 +1,9 @@
-
 \documentclass[headings=small,a4paper,12pt]{scrartcl}
 \usepackage{nicefrac}
 \usepackage{2111defs2}
 %
+%\newcommand{\sorted}[3]{\mathit{s'ed}(#1[#2..#3])}
+\newcommand{\sort}[3]{\mathit{sort}(#1[#2..#3])}
 \newcommand{\pre}{\mathit{pre}}
 \newcommand{\post}{\mathit{post}}
 \newcommand{\bfs}{\textsc{breath first search}\xspace}
@@ -60,54 +61,54 @@ The derivation of $\bfs$ on a tree using a bounded $\qu$.
       \begin{array}{l}
        % the visited here means the visited set which should be introduced before
       \left(
-	  \begin{array}{l}
-		\Not f \And 0 \leqslant n \leqslant N \And K_t(tmp) \neq k\\
-		\Or (f\And  K_t(tmp) = k \And \lambda_t(tmp) = v)
+    \begin{array}{l}
+    \Not f \And 0 \leqslant n \leqslant N \And K_t(tmp) \neq k\\
+    \Or (f\And  K_t(tmp) = k \And \lambda_t(tmp) = v)
         \end{array}
-	  	\right)\\
-     	 \And \forall x\in V_t(x\in \Gamma^{*}_{t}(r_t)\And x \notin\Gamma^{+}_{t}(x))
-	\end{array}
+      \right)\\
+       \And \forall x\in V_t(x\in \Gamma^{*}_{t}(r_t)\And x \notin\Gamma^{+}_{t}(x))
+  \end{array}
     \right)}\\
 \end{align*}
 %---
 \break
 \begin{align*}
-\lrefstep{(2)}{seq}	
+\lrefstep{(2)}{seq} 
 {
-	\nt{q,n,v,f:[\pre(2), I] }{(3)}\\
-	&;\nt{q,n,v,f:[I, \post(2)] }{(4)}\\
- }\\			
+  \nt{q,n,v,f:[\pre(2), I] }{(3)}\\
+  &;\nt{q,n,v,f:[I, \post(2)] }{(4)}\\
+ }\\      
 %
-\lrefstep{(3)}{seq}	
+\lrefstep{(3)}{seq} 
 {
-	\nt{q,n,v,f:[\pre(3), \pre(3)\And q=<>\And \Not f] }{(5)}\\
-	&;\nt{q,n,v,f:[\pre(3)\And q=<>\And \Not f,I] }{(6)}\\
- }\\			
+  \nt{q,n,v,f:[\pre(3), \pre(3)\And q=<>\And \Not f] }{(5)}\\
+  &;\nt{q,n,v,f:[\pre(3)\And q=<>\And \Not f,I] }{(6)}\\
+ }\\      
 %
-\lrefstep{(5)}{ass}	
+\lrefstep{(5)}{ass} 
 {
-	q \Ass initialise(N);~f \Ass \Not f\\
- }\\			
+  q \Ass initialise(N);~f \Ass \False\\
+ }\\      
 %
-\lrefstep{(6)}{i-loc}	
+\lrefstep{(6)}{i-loc} 
 {
-	\VAR~tmp\cdot{}\nt{tmp,q,n,v,f:[\pre(3)\And q=<>\And \Not f,I] }{(7)}\\
- }\\			
+  \VAR~tmp\cdot{}\nt{tmp,q,n,v,f:[\pre(3)\And q=<>\And \Not f,I] }{(7)}\\
+ }\\      
  \refstep{\textbf{ass}}
 {
-	q \Ass <r_t>\\
-	& n \Ass 1\\
+  q \Ass <r_t>\\
+  & n \Ass 1\\
 }\\
 %
 \lrefstep{(4)}{\textbf{s-post}}
 {q,n:[I\And~g, I\And (f \Or~ q=<>)]}\\
 %
-\refstep{\textbf{\WHILE}}	
+\refstep{\textbf{\WHILE}} 
 {
-	\WHILE~n \neq 0 \And \Not f ~\DO\\
-	    &\qquad \nt{q,n:[I\And~g, I]}{8}\\
-	&\OD
- }\\	
+  \WHILE~n \neq 0 \And \Not f ~\DO\\
+      &\qquad \nt{q,n:[I\And~g, I]}{8}\\
+  &\OD
+ }\\  
  \lrefstep{(8)}
  {\textbf{seq}}
  {\nt{n,q:[g\And~I\And~q=<z,qt>, q=qt\And tmp=z]}{(a)}\\
@@ -134,6 +135,27 @@ The derivation of $\bfs$ on a tree using a bounded $\qu$.
 \end{align*}
 i-loc tmp $\implies$ $k_t(tmp)$ $\ne$ k, $tmp$ is a variable that is not mapped to anything hence $k_t$ does not exist.\\
 $n =1$ after assignment and N is the maximum number of nodes available. hence $pre + blah \implies invariant$. \\
+%
+\\
+%
+\section{Code}
+\label{sec:code}
+Putting the code together we have
+\begin{align}
+    &q\Ass initialise(N)\\
+    &f\Ass \False\\
+    &q\Ass <r_t>\\
+    &n\Ass 1\\
+    &\WHILE~n \ne 0\And \Not f~\DO\\
+    &\qquad tmp\Ass dequeue(q,n)\\
+    &\qquad \IF~k_t(tmp) = k~\THEN\\
+    &\qquad\qquad f\Ass \True\\
+    &\qquad\qquad v\Ass \lambda_t(tmp)\\
+    &\qquad \ELSE\\
+    &\qquad\qquad addAllChildren\\
+    &\qquad\FI\\
+    &\OD
+\end{align}
 
 %---following are queue operation
 Define the following queue operation:\\
@@ -161,6 +183,7 @@ Define the following queue operation:\\
     &\qquad {n,f:[n = length(q) ,(\Not f \And n \neq 0)\Or (f \And n = 0)]}\\
 \end{align*}
 \break
+we need to adjust the n, every time we add or remove from the queue.\\
 
 \end{document}
 
