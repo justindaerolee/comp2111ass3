@@ -59,11 +59,10 @@ The derivation of $\bfs$ on a tree using a bounded $\qu$.
 \begin{align*}
     {I:=\left(
       \begin{array}{l}
-       % the visited here means the visited set which should be introduced before
       \left(
     \begin{array}{l}
-    \Not f \And 0 \leqslant n \leqslant N \And K_t(tmp) \neq k\\
-    \Or (f\And  K_t(tmp) = k \And \lambda_t(tmp) = v)
+    (\Not f \And q \neq <>)\\
+    \Or (f\And \exists x \in V_t( x \notin q \And \Gamma_t(x) \subseteq q \And K_t(x) = k \And \lambda_t(x) = v))
         \end{array}
       \right)\\
        \And \forall x\in V_t(x\in \Gamma^{*}_{t}(r_t)\And x \notin\Gamma^{+}_{t}(x))
@@ -101,7 +100,7 @@ The derivation of $\bfs$ on a tree using a bounded $\qu$.
 }\\
 %
 \lrefstep{(4)}{\textbf{s-post}}
-{q,n:[I\And~g, I\And (f \Or~ q=<>)]}\\
+{q,n:[I, I\And (f \Or~ q=<>)]}\\
 %
 \refstep{\textbf{\WHILE}} 
 {
