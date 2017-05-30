@@ -1,6 +1,7 @@
 \documentclass[headings=small,a4paper,12pt]{scrartcl}
 \usepackage{nicefrac}
 \usepackage{2111defs2}
+\usepackage{amsmath}
 %
 %\newcommand{\sorted}[3]{\mathit{s'ed}(#1[#2..#3])}
 \newcommand{\sort}[3]{\mathit{sort}(#1[#2..#3])}
@@ -40,12 +41,44 @@ We define the following queue operation:\\
 \end{align*}
 \textbf{\enq:} adds an item to a queue if there's a space available 
 \begin{align*}
-  &\enq\qquad n,q:[\True, q=\langle q_0,x\rangle]\isrefinedby \enq(q,x)
+  &\enq\qquad q:[\True, q=\langle q_0,x\rangle]\isrefinedby \enq(q,x)
 \end{align*}
-%
 \textbf{\deq:} return the oldest item in the queue and remove it form the queue\\
 \begin{align*}
-    &\deq\qquad n,q:[n>0\And q=\langle s,qp\rangle\And q\ne~\langle\rangle, s= s_0\And q = qp] \isrefinedby qp \Ass \deq(q) 
+ %   &\deq\qquad n,q:[n>0\And q=\langle s,qp\rangle\And q\ne~\langle\rangle, s= s_0\And q = qp] \isrefinedby qp \Ass \deq(q) 
+	&\deq\qquad q,x:[q = <a,b>, x = a \And q = b] \isrefinedby x \Ass \deq(q) 
+\end{align*}
+We do the data refinement to take the abstract queue to a more concrete representation using circular buffer, that is an array \textit{r} of  \textit{N+1} cells and two counters \textit{h} and \textit{t} for which \textit{h} = 0 and \textit{t} = -1 when \textit{r} is empty, otherwise \textit{h mod (N+1)} and \textit{t mod (N+1)}  the head and tail indexs of \textit{r} which represents the head and tail of the queue.\\
+%
+Using the Reynolds method, the coupling invariant would be:\\
+\begin{align*}
+	&C: Q(V_t) \times V^*_t \times \mathbb{N}  &\to & \mathbb{B}\\
+	&C(<>,r,h,t)  &=  &(t - h+1 = 0)\\
+	&C(<q,x>,r,h,t) &= &(r[t\mod (N+1)]=x \And C(q,r,h,t))\\
+	&C(<x,q>,r,h,t) &= &(x = r[h\mod (N+1)] \And C(q,r,h,t))
+\end{align*}
+For $\ini$ operations:\\
+\begin{align*}
+	 &\nt{q,r,h,t:[\True, q=<> \And C(<>,r,h,t)]}{(I_1)}\\
+%
+	\lrefstep{(I_1)}
+	{\textbf{seq}} 
+	{
+ 		 \nt{q:[\True,q=<>] }{(I_2)}\\
+ 		 &;\nt{r,h,t:[q=<>, q=<> \And C(<>,r,h,t)]] }{(I_3)}\\
+	 }\\    
+%   
+	\lrefstep{(I_2)}
+	{\textbf{\ini}} 
+	{
+ 		 q:=<> \\
+	 }\\   
+%   
+	\lrefstep{(I_3)}
+	{\textbf{ass}} 
+	{
+ 		 h := 0 ;~t := -1
+	 }\\    
 \end{align*}
 \break
 \section{The Derivation}
@@ -202,13 +235,13 @@ Because $tmp$ is not the node we are looking for, we now have to make sure the c
 \label{sec:code}
 Putting the code together we have
 \begin{align}
-    &\VAR~q\Ass\langle\rangle\\
+    &\textcolor{red}{\VAR~q\Ass\langle\rangle}\\
     &\VAR~n:\mathbb{N}\Ass 0\\
     &f\Ass \False\\
-    &\enq(q,r_t)\\
+    &\textcolor{red}{\enq(q,r_t)}\\
     &n\Ass 1\\
     &\WHILE~n \ne 0\And \Not f~\DO\\
-    &\qquad \VAR~tmp\Ass \deq(q,n)\\
+    &\textcolor{red}{\qquad \VAR~tmp\Ass \deq(q,n)}\\
     &\qquad n\Ass n-1\\
     &\qquad \IF~k_t(tmp) = k~\THEN\\
     &\qquad\qquad f\Ass \True\\
@@ -217,13 +250,14 @@ Putting the code together we have
     &\qquad\qquad \VAR~m\Ass \Gamma_t(tmp)\\
     &\qquad\qquad\WHILE~m \ne \emptyset~\DO\\
     &\qquad\qquad\qquad\VAR~c:\in~m\\
-    &\qquad\qquad\qquad\enq(q,c)\\
+    &\textcolor{red}{\qquad\qquad\qquad\enq(q,c)}\\
     &\qquad\qquad\qquad n \Ass n+1\\
     &\qquad\qquad\qquad m\Ass m\backslash\{c\}\\
     &\qquad\qquad\OD\\
     &\qquad\FI\\
     &\OD
 \end{align}
+Text in \textcolor{red}{red} are abstract queue operations.\\
 \section{MAYBE RUBBISH}
 \label{sec:rubbish}
 include that children of tmp do not exist in q in precondition\\
