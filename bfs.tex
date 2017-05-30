@@ -11,6 +11,7 @@
 \newcommand{\qu}{\textsc{queue}\xspace}
 \newcommand{\enq}{\textsc{enqueue}\xspace}
 \newcommand{\deq}{\textsc{dequeue}\xspace}
+\newcommand{\ini}{\textsc{initialise}\xspace}
 %
 \title{Derivation of $\bfs$\\
 \large COMP2111 assignment 3}
@@ -25,6 +26,28 @@
 \label{sec:introduction}
 The derivation of $\bfs$ on a tree using a bounded $\qu$. 
 %
+%---following are queue operation
+We extend the toy language with queues and queue operations, and operations on abstract queues, which we eliminate later with data refinement. 
+\begin{align*}
+    &Q(\tau) ::= \langle\rangle\qquad\text{(empty queue)}\\
+    &|\qquad\langle~x,t~\rangle\qquad\text{where $x\in\tau$ and $t\in~Q(\tau)$}\\
+    &|\qquad\langle~t,x~\rangle\\
+\end{align*}
+We define the following queue operation:\\
+\textbf{initialise:} initialise a queue that can hold up to \textit{N} elements to the empty queue value.
+\begin{align*}
+  &\ini\qquad~q :[\True, q = \langle\rangle] \isrefinedby q\Ass \langle\rangle
+\end{align*}
+\textbf{\enq:} adds an item to a queue if there's a space available 
+\begin{align*}
+  &\enq\qquad n,q:[\True, q=\langle q_0,x\rangle]\isrefinedby \enq(q,x)
+\end{align*}
+%
+\textbf{\deq:} return the oldest item in the queue and remove it form the queue\\
+\begin{align*}
+    &\deq\qquad n,q:[n>0\And q=\langle s,qp\rangle\And q\ne~\langle\rangle, s= s_0\And q = qp] \isrefinedby qp \Ass \deq(q) 
+\end{align*}
+\break
 \section{The Derivation}
 \label{sec:derivation}
 %
@@ -72,16 +95,7 @@ The derivation of $\bfs$ on a tree using a bounded $\qu$.
     \end{array}
     \right)\\
 \end{align*}
-$j$ is defined as the distance from the root node, to the current node.\\
-We prove that the precondition to the procedure search implies the invariant
-\begin{align*}
-    &I\subst{1}{n}\subst{\langle\rangle}{q}\subst{\False}{f}\subst{\langle\rangle}{q}\\
-    &=  \exists j\in \mathbb{N}\cdot{}(\forall~x \in \Gamma^{\forall~i<j}(r_t)\cdot{}K_t(x) \ne k)\\
-    &\And 0\leq~1\leq~N\And\langle\rangle \subseteq \Gamma^0_t(r_t)\\
-    &\And (\forall y\in V_t(y\in \Gamma^{*}_{t}(r_t)\And y \notin\Gamma^{+}_{t}(y)))\\
-    &\And\forall~p \in \Gamma^0_t(r_t) \And p\notin~\langle\rangle \And k_t(p) \ne k)
-\end{align*}\\
-most of the invariant is made redundant by the fact that the q is substituted by an empty set and the because f is substituted by $\False$. The only value that $j$ can be is $0$.\\
+$j$ is defined as the distance from the root node, to the current node.
 \\
 The first line of the invariant shows that all previous levels of the tree before the node most recently $\deq$ has given a false when checked.\\
 the second line and third line of the invariant show that the queue, $q$ is composed of only two levels of the tree at any given time.\\
@@ -93,6 +107,8 @@ In the case that $f=\False\And~n=0$ the first and last line of the invariant sho
 Therefore $I\And(f\Or~n=0)$ implies the post condition\\
 %---
 \break
+\section{The Derivation continued ...}
+\label{sec:derivation2}
 \begin{align*}
 \lrefstep{(2)}{seq} 
 {
@@ -108,12 +124,13 @@ Therefore $I\And(f\Or~n=0)$ implies the post condition\\
 %
 \lrefstep{(5)}{ass} 
 {
-  q \Ass initialise();~f \Ass \False\\
+  q \Ass initialise();\\
+  &f \Ass \False\\
  }\\      
 %
 \lrefstep{(6)}{ass} 
 {
-  \enq(q,r_t)\\
+  \enq(q,r_t);\\
   & n \Ass 1\\
 }\\
 %
@@ -143,41 +160,25 @@ Therefore $I\And(f\Or~n=0)$ implies the post condition\\
 %
 \lrefstep{(a)}
 {\textbf{ass}}
-{tmp \Ass dequeue(q,n)}\\
+{tmp \Ass \deq(q,n)}\\
 %
 \lrefstep{(c)}
 {\textbf{ass}}
-{f\Ass true; v = \lambda_t(tmp)}\\
+{f\Ass \True;\\
+&v = \lambda_t(tmp)}\\
 %
-\lrefstep{(d)}
-{\textbf{ass}}
-{add all children to q}\\
 \end{align*}
-%---following are queue operation
-Define the following queue operation:\\
-\textbf{initialise:} initialise a queue that can hold up to \textit{N} elements to the empty queue vlaue.
+explain the refinement of the other while loop
 \begin{align*}
-  &initialise~q :[\True, q = \langle\rangle] \isrefinedby q\Ass \langle\rangle\\
+    \lrefstep{(d)}
+    {\textbf{...}}
+    {\WHILE~m \ne \emptyset~\DO\\
+    &\qquad\VAR~c:\in~m\\
+    &\qquad\enq(q,c)\\
+    &\qquad n \Ass n+1\\
+    &\qquad m\Ass m\backslash\{c\}\\
+    &\OD\\}
 \end{align*}
-\break
-\textbf{\enq:} adds an item to a queue if there's a space available 
-\begin{align*}
-  &\enq\qquad n,q:[\True, q=\langle q_0,x\rangle]\isrefinedby \enq(q,x)
-\end{align*}
-%
-\textbf{\deq:} return the oldest item in the queue and remove it form the queue\\
-\begin{align*}
-    &\deq\qquad n,q:[n>0\And q=\langle s,qp\rangle\And q\ne~\langle\rangle, s= s_0\And q = qp] \isrefinedby qp \Ass \deq(q) 
-\end{align*}
-\break
-\textbf{isempty:} return whether a queue is empty
-\begin{align*}
-  &\RETURN~isempty(n, \RETURN f)\cdot{}\\
-    &\qquad {n,f:[n = length(q) ,(\Not f \And n \neq 0)\Or (f \And n = 0)]}\\
-\end{align*}
-\break
-we need to adjust the n, every time we add or remove from the queue.\\
-\\
 %
 \section{Code}
 \label{sec:code}
@@ -189,7 +190,7 @@ Putting the code together we have
     &\enq(q,r_t)\\
     &n\Ass 1\\
     &\WHILE~n \ne 0\And \Not f~\DO\\
-    &\qquad \VAR~tmp\Ass dequeue(q,n)\\
+    &\qquad \VAR~tmp\Ass \deq(q,n)\\
     &\qquad n\Ass n-1\\
     &\qquad \IF~k_t(tmp) = k~\THEN\\
     &\qquad\qquad f\Ass \True\\
@@ -200,10 +201,53 @@ Putting the code together we have
     &\qquad\qquad\qquad\VAR~c:\in~m\\
     &\qquad\qquad\qquad\enq(q,c)\\
     &\qquad\qquad\qquad n \Ass n+1\\
-    &\qquad\qquad\qquad~m\Ass m\backslash\{c\}\\
+    &\qquad\qquad\qquad m\Ass m\backslash\{c\}\\
     &\qquad\qquad\OD\\
     &\qquad\FI\\
     &\OD
 \end{align}
-We define the second invariant $I_2 = \Gamma_t(tmp) \subseteq m \cup q$\\
+\section{MAYBE RUBBISH}
+\label{sec:rubbish}
+include that children of tmp do not exist in q in precondition\\
+\begin{align*}
+\lrefstep{(d)}
+{\textbf{i-loc}}
+{\VAR~m\cdot{} \nt{[k_t(tmp) \ne k, q= q_0\cdot{}\Gamma~(tmp)]}{(d_1)}}\\
+%
+\lrefstep{(d_1)}
+{\textbf{s-post}}
+{m,tmp,q:[k_t(tmp) \ne k, \Gamma_t(tmp) \subseteq q]}\\
+%
+\refstep
+{\textbf{seq}}
+{\nt{m,q,tmp:[k_t(tmp) \ne k, \Gamma_t(tmp) \subseteq m\cup q]}{(e)}\\
+&\nt{m,tmp,q:[\Gamma_t(tmp) \subseteq m\cup q, \Gamma_t(tmp) \subseteq q]}{(f)}}\\
+%
+\lrefstep{(e)}
+{\textbf{ass}}
+{\VAR~m\Ass\Gamma_t(tmp)}\\
+%
+\lrefstep{(f)}
+{\textbf{\WHILE}}
+{\WHILE~m\ne~\emptyset~\DO\\
+&\qquad~\nt{m,tmp,q:[\Gamma_t(tmp)\subseteq m\cup~q\And m\ne\emptyset,\Gamma_t(tmp)\subseteq m\cup~q]}{(g)}\\
+&\OD}\\
+%
+\lrefstep{(g)}
+{\textbf{i-loc}}
+{\VAR~c\cdot{}\nt{c,m,tmp,q:[\Gamma_t(tmp)\subseteq m\cup~q\And m\ne\emptyset,\Gamma_t(tmp)\subseteq m\cup~q]}{(h)}}\\
+%
+\lrefstep{(h)}
+{\textbf{seq}}
+{c,m,tmp,q:[\Gamma_t(tmp)\subseteq m\cup~q\And m\ne\emptyset,\Gamma_t(tmp)\subseteq m\cup~q]}
+\end{align*}\\
+We prove that the precondition to the procedure search implies the invariant
+\begin{align*}
+    &I\subst{1}{n}\subst{\langle\rangle}{q}\subst{\False}{f}\subst{\langle\rangle}{q}\\
+    &=  \exists j\in \mathbb{N}\cdot{}(\forall~x \in \Gamma^{\forall~i<j}(r_t)\cdot{}K_t(x) \ne k)\\
+    &\And 0\leq~1\leq~N\And\langle\rangle \subseteq \Gamma^0_t(r_t)\\
+    &\And (\forall y\in V_t(y\in \Gamma^{*}_{t}(r_t)\And y \notin\Gamma^{+}_{t}(y)))\\
+    &\And\forall~p \in \Gamma^0_t(r_t) \And p\notin~\langle\rangle \And k_t(p) \ne k)
+\end{align*}\\
+most of the invariant is made redundant by the fact that the q is substituted by an empty set and the because f is substituted by $\False$. The only value that $j$ can be is $0$.\\
 \end{document}
