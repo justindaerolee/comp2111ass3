@@ -91,7 +91,7 @@ We define the following queue operation:\\
          \And q[l+1..n-1] \subseteq \Gamma^{j+1}_t(r_t)\\
          \And (\forall y\in V_t(y\in \Gamma^{*}_{t}(r_t)\And y \notin\Gamma^{+}_{t}(y)))\\
          \And ((f\And\exists~s\in \Gamma^{j}_{t}(r_t)\cdot{}k_t(s) = k\And \lambda_t(s) = v\And s\notin q)\\
-         \Or (\Not~f \And \forall~p \in \Gamma^j_t(r_t) \And p\notin~q \And k_t(p) \ne k))
+         \Or (\Not~f \And \forall~p \in \Gamma^j_t(r_t) \And p\notin~q \And k_t(p) \ne k \And \Gamma_t(p) \subseteq q))
     \end{array}
     \right)\\
 \end{align*}
@@ -110,31 +110,40 @@ Therefore $I\And(f\Or~n=0)$ implies the post condition\\
 \section{The Derivation continued ...}
 \label{sec:derivation2}
 \begin{align*}
-\lrefstep{(2)}{seq} 
+\lrefstep{(2)}
+{\textbf{seq} no initial variables} 
 {
   \nt{q,n,v,f:[\pre(2), I] }{(3)}\\
   &;\nt{q,n,v,f:[I, \post(2)] }{(4)}\\
- }\\      
+ }\\
+\end{align*}
 %
-\lrefstep{(3)}{seq} 
+We derive code by initialising $f$ to $\False$ and $\enq$ the root node to establish our invariant initially.
+%
+\begin{align*}
+\lrefstep{(3)}
+{\textbf{seq} no initial variables} 
 {
   \nt{q,n,v,f:[\pre(3), \pre(3)\And q=<>\And \Not f] }{(5)}\\
   &;\nt{q,n,v,f:[\pre(3)\And q=<>\And \Not f,I] }{(6)}\\
  }\\      
 %
-\lrefstep{(5)}{ass} 
+\lrefstep{(5)}
+{\textbf{ass}} 
 {
   q \Ass initialise();\\
   &f \Ass \False\\
  }\\      
 %
-\lrefstep{(6)}{ass} 
+\lrefstep{(6)}
+{\textbf{ass}} 
 {
   \enq(q,r_t);\\
   & n \Ass 1\\
 }\\
 %
-\lrefstep{(4)}{\textbf{s-post}}
+\lrefstep{(4)}
+{\textbf{s-post}}
 {q,n:[I\And~g, I\And (f \Or~ q=<>)]}\\
 %
 \refstep{\textbf{\WHILE}} 
@@ -143,32 +152,41 @@ Therefore $I\And(f\Or~n=0)$ implies the post condition\\
       &\qquad \nt{q,n:[I\And~n\ne~0\And\Not~f, I]}{(7)}\\
   &\OD
  }\\  
+%
  \lrefstep{(7)}
  {\textbf{i-loc}}
  {\VAR~tmp\cdot{}\nt{tmp,q,n:[I\And~n\ne~0\And\Not~f, I]}{(8)}}\\
+%
  \lrefstep{(8)}
  {\textbf{seq}}
  {\nt{tmp,n,q:[g\And~I\And~q=<z,qt>, q=qt\And tmp=z]}{(a)}\\
  &;\nt{tmp,n,q:[q=qt\And tmp=z, I]}{(b)}}\\
+%
  \lrefstep{(b)}
  {\textbf{if}}
  {\IF~k_t(tmp) = k~\THEN\\
- &\qquad~\nt{f,v:[\NOT~f\And k_t(tmp) = k, f\And~v=\lambda_t(tmp) ]}{(c)}\\
+ &\qquad~\nt{f,v:[\NOT~f\And k_t(tmp) = k, I]}{(c)}\\
  &\ELSE\\
- &\qquad \nt{[k_t(tmp) \ne k, q= q_0\cdot{}\Gamma~(tmp)]}{(d)}\\
+ &\qquad \nt{[k_t(tmp) \ne k, I]}{(d)}\\
  &\FI}\\
 %
 \lrefstep{(a)}
 {\textbf{ass}}
 {tmp \Ass \deq(q,n)}\\
+\end{align*}
 %
+To make the invariant $\True$ if $k_t(tmp) = k$, we have to assign $f \Ass \True$ because the sixth line of the invariant tell us that $f$ cannot be $\False$ when $k_t(tmp) = k$.\\
+Now make the fifth line of the invariant true assign\\ $\lambda_t(tmp) = v$ such that the invariant is $True$.\\
+%
+\begin{align*}
 \lrefstep{(c)}
 {\textbf{ass}}
 {f\Ass \True;\\
 &v = \lambda_t(tmp)}\\
 %
 \end{align*}
-explain the refinement of the other while loop
+Because $tmp$ is not the node we are looking for, we now have to make sure the conditions of the invariant are met. The invariant tells us that $q$ contains up-to two levels of the tree at any given time. We also know that since $tmp$ has been $\deq$ from $q$, $tmp \notin q$, hence the end of the 5th line of the invariant tells us that the children of all the nodes that are on the current level but not in $q$ must be a subset of $q$, therefore all the children of $tmp$ have to be added to $q$ to meet the invariant\\
+
 \begin{align*}
     \lrefstep{(d)}
     {\textbf{...}}
