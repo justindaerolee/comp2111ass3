@@ -8,27 +8,26 @@
 // change to c code.
 void search (Tree root, unsigned int N, Key key, T *val, RetVal *found) {
     //initialisation
-    //(1)and(5)
-    List q[N];
-    int n;
+    //(1)-(4)
+    Tree r[N+1];
+    int h = 0;
+    int t = -1;
+    int n = 0;
     *found = Failure;
-    //(6)
-    Tree tmp;
-    List head;
-    head->n = root;
-    head->next = NULL;
-    q[0] = head;
-    n = 1;
-    //not shown in the tex file
-    int a, b = 0;
-    //(4) while loop
+    //(5)-(6)
+    if (root = null)return;
+    t++; 
+    r[t % (N+1)] = root;
+    //(7)
+    n++;
+    //(8-) while loop
     while (n != 0 && *found == Failure) {
-    	//(8)(a)
-        //dequeue
-        tmp = q[a]->n;
-        a ++;
+        //(9)-(10)dequeue
+        Tree tmp = r[h % (N+1)];
+        h ++;
+        //(11)
         n --;//do n--/n++ or n = b-a+1?
-        //(8)(b)
+        //(12-)if statement
         // if found no need to continue the search
         if (tmp->id == key) {
         	//(8)(c)
@@ -37,25 +36,26 @@ void search (Tree root, unsigned int N, Key key, T *val, RetVal *found) {
         } else {
         	//(8)(d)
             // else add all the children of the tmp tree.
-            List *children = tmp->list;
-            while (children != NULL) {
-                add(q, children, n);
-                b++;
+            List *m = tmp->list;
+            while (m != NULL) {
+            	Tree c = m->n;
+                t++;
+                r[t % (N+1)] = c;
                 n++;
-                children = children->next;
+                m = m->next;
             }
         }
     }
 }
 
-void enq(List *q, Tree v, int n) {
-    List *tmp = q;
-    int i = 1;
-    while (i != n) {
-        tmp = tmp->next;
-    }
-    tmp->next = v;
-}
+// void enq(List *q, Tree v, int n) {
+//     List *tmp = q;
+//     int i = 1;
+//     while (i != n) {
+//         tmp = tmp->next;
+//     }
+//     tmp->next = v;
+// }
 
 
 // abstract bounded queue, q
