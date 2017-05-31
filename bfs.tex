@@ -25,10 +25,10 @@
 %
 \section{Introduction}
 \label{sec:introduction}
-The derivation of $\bfs$ on a tree using a bounded $\qu$. 
+The derivation of $\bfs$ on a tree using a bounded $\qu$.\\ 
 %
 %---following are queue operation
-We extend the toy language with queues and queue operations, and operations on abstract queues, which we eliminate later with data refinement. 
+Firstly we extend the toy language with queues and queue operations, and operations on abstract queues, which we eliminate later with data refinement. 
 \begin{align*}
     &Q(\tau) ::= \langle\rangle\qquad\text{(empty queue)}\\
     &|\qquad\langle~x,t~\rangle\qquad\text{where $x\in\tau$ and $t\in~Q(\tau)$}\\
@@ -46,90 +46,9 @@ We define the following queue operation:\\
 \textbf{\deq:} return the oldest item in the queue and remove it form the queue\\
 \begin{align*}
  %   &\deq\qquad n,q:[n>0\And q=\langle s,qp\rangle\And q\ne~\langle\rangle, s= s_0\And q = qp] \isrefinedby qp \Ass \deq(q) 
-	&\deq\qquad q,x:[q = <a,b>, x = a \And q = b] \isrefinedby x \Ass \deq(q) 
-\end{align*}
-We do the data refinement to take the abstract queue to a more concrete representation using circular buffer, that is an array \textit{r} of  \textit{N+1} cells and two counters \textit{h} and \textit{t} for which \textit{h} = 0 and \textit{t} = -1 when \textit{r} is empty, otherwise \textit{h mod (N+1)} and \textit{t mod (N+1)}  the head and tail indexs of \textit{r} which represents the head and tail of the queue.\\
-%
-Using the Reynolds method, the coupling invariant would be:\\
-\begin{align*}
-	&C: Q(V_t) \times V^*_t \times \mathbb{N}\times \mathbb{Z}  &\to & \mathbb{B}\\
-	&C(<>,r,h,t)  &=  &(t - h+1 = 0)\\
-	&C(<q,x>,r,h,t) &= &(r[t\mod (N+1)]=x \And C(q,r,h,t))\\
-	&C(<x,q>,r,h,t) &= &(x = r[h\mod (N+1)] \And C(q,r,h,t))
-\end{align*}
-For $\ini$ operations:\\
-\begin{align*}
-	&\nt{q,r,h,t:[\True, q=<> \And C(<>,r,h,t)]}{(I_1)}\\\\
-%
-	\lrefstep{(I_1)}
-	{\textbf{sc, c-frame...}} 
-	{
- 		 \nt{q:[\True,q=<>] }{(I_2)}\\
- 		 &;\nt{r,h,t:[q=<>, q=<> \And C(<>,r,h,t)]] }{(I_3)}
-	 }\\    
-%   
-	\lrefstep{(I_2)}
-	{\textbf{\ini}} 
-	{
- 		 q:=<> 
-	 }\\   
-%   
-	\lrefstep{(I_3)}
-	{\textbf{ass}} 
-	{
- 		 h := 0 ;~t := -1
-	 }\\    
+  &\deq\qquad q,x:[q = <a,b>, x = a \And q = b] \isrefinedby x \Ass \deq(q) 
 \end{align*}
 %
-For $\enq$ operations:\\
-\begin{align*}
-	&\nt{q,r,h,t:[ C(q,r,h,t), q=<q_0, x> \And C(q,r,h,t)]}{(E_1)}\\\\
-%
-	\lrefstep{(E_1)}
-	{\textbf{sc, c-frame...}} 
-	{
-		\CON~Q;\\
- 		 &\nt{q:[C(Q,r,h,t) \And q = Q, q=<Q,x>\And C(Q,r,h,t)] }{(E_2)}\\
- 		 &;\nt{r,t:[ q=<Q,x>\And C(Q,r,h,t),  q=<Q,x>\And C(q,r,h,t)] }{(E_3)}\\
-	 }\\    
-%   
-	\lrefstep{(E_2)}
-	{\textbf{\enq}} 
-	{
- 		 \enq(q,x) 
-	 }\\   
-%   
-	\lrefstep{(E_3)}
-	{\textbf{ass}} 
-	{
- 		 t = t+1 ;~r[t \mod (N+1)] = x
-	 }\\   
-\end{align*}
-%
-For $\deq$ operations:\\
-\begin{align*}
-	&\nt{x,q,r,h,t:[q=<a,b>\And C(q,r,h,t),x=a \And q=b \And C(q,r,h,t)]}{(D_1)}\\\\
-%
-	\lrefstep{(D_1)}
-	{\textbf{sc, c-frame,w-pre...}} 
-	{
- 		 \nt{q,x:[q=<a,b>\And C(q,r,h,t), x=a \And q=b \And C(<a,b>,r,h,t) }{(D_2)}\\
- 		 &;\nt{r,h,x:[q=b \And C(<a,b>,r,h,t),  x=a \And q=b \And C(q,r,h,t)] }{(D_3)}\\
-	 }\\    
-%   
-	\lrefstep{(D_2)}
-	{\textbf{\enq}} 
-	{
- 		 x=\deq(q) 
-	 }\\   
-%   
-	\lrefstep{(D_3)}
-	{\textbf{ass}} 
-	{
- 		x = r[h \mod (N+1)];~h = h+1
-	 }\\   
-\end{align*}
-\break
 \section{The Derivation}
 \label{sec:derivation}
 %
@@ -168,7 +87,7 @@ For $\deq$ operations:\\
 \begin{align*}
     &I = \left(
     \begin{array}{l}
-         \exists j\in \mathbb{N}\cdot{}(\forall~x \in \Gamma^{\forall~i<j}(r_t)\cdot{}K_t(x) \ne k)\\
+         \exists j\in \mathbb{N}\cdot{}(\forall~i<j\cdot{}\forall~x \in \Gamma^{i}(r_t)\cdot{}K_t(x) \ne k)\\
          \And 0\leq~n\leq~N\And \exists~l\in[0,n-1] \cdot{}q[0..l] \subseteq \Gamma^j_t(r_t)\\
          \And q[l+1..n-1] \subseteq \Gamma^{j+1}_t(r_t)\\
          \And (\forall y\in V_t(y\in \Gamma^{*}_{t}(r_t)\And y \notin\Gamma^{+}_{t}(y)))\\
@@ -177,11 +96,14 @@ For $\deq$ operations:\\
     \end{array}
     \right)\\
 \end{align*}
-$j$ is defined as the distance from the root node, to the current node.
+$j$ is defined as a node's distance from the root node, or the level of that node in the tree, hence at root node, j = 0.\\
+%
+The first line of the invariant shows that all previous levels of the tree before the current level has been visited and the key was not found.\\
+the second line and third line of the invariant show that the queue, $q$ is composed of at most only two levels of the tree at any given time, $j$ (being defined at the current level) and $j+1$.\\
+The fifth line of the invariant says that if $f$ then for some node on the current level there exists the node we are looking for.\\
+The sixth line says all current level nodes that are not in $q$, are not the nodes we are looking for and their children are a subset of q.\\
 \\
-The first line of the invariant shows that all previous levels of the tree before the node most recently $\deq$ has given a false when checked.\\
-the second line and third line of the invariant show that the queue, $q$ is composed of only two levels of the tree at any given time.\\
-Since $0\leq~n\leq~N$, and $n$ is described as the length of the queue\\ $\max_{i\in\mathbb{N}}|\Gamma_t^{i}(r_t)\cup\Gamma_{t}^{i+1}(r_t)|\leq N$, of the precondition implies the second and third line of the invariant. Showing that $n$ the length of the queue cannot exceed the number of nodes of two consecutive levels of the tree\\
+Since $0\leq~n\leq~N$, and $n$ is described as the length of the queue\\ $\max_{i\in\mathbb{N}}|\Gamma_t^{i}(r_t)\cup\Gamma_{t}^{i+1}(r_t)|\leq N$, of the precondition implies the second and third line of the invariant. Showing that $n$ the length of the queue cannot exceed the number of nodes of two consecutive levels of the tree, hence $n\leq~N$, $N$ representing the number of nodes of the last two levels of the tree.\\
 The invariant also contains the fact that all nodes are connected as a tree data structure, identical to that in the precondition.\\
 \\
 $I\And(f\Or~n=0)$, When $f=\True$ the invariant describes that some node,\\ $s\in\Gamma^j_t(r_t)\cdot{}k_t(s) = k\And \lambda_t(s) = v\And s\notin q$, which implies the post condition in the scenario that $f = \True$\\
@@ -198,11 +120,7 @@ Therefore $I\And(f\Or~n=0)$ implies the post condition\\
   \nt{q,n,v,f:[\pre(2), I] }{(3)}\\
   &;\nt{q,n,v,f:[I, \post(2)] }{(4)}\\
  }\\
-\end{align*}
 %
-We derive code by initialising $f$ to $\False$ and $\enq$ the root node to establish our invariant initially.
-%
-\begin{align*}
 \lrefstep{(3)}
 {\textbf{seq} no initial variables} 
 {
@@ -210,6 +128,11 @@ We derive code by initialising $f$ to $\False$ and $\enq$ the root node to estab
   &;\nt{q,n,v,f:[\pre(3)\And q=<>\And \Not f,I] }{(6)}\\
  }\\      
 %
+\end{align*}
+%
+We derive code by initialising $f$ to $\False$ and $\enq$ the root node to establish our invariant initially.
+%
+\begin{align*}
 \lrefstep{(5)}
 {\textbf{ass}} 
 {
@@ -225,35 +148,35 @@ We derive code by initialising $f$ to $\False$ and $\enq$ the root node to estab
 }\\
 %
 \lrefstep{(4)}
-{\textbf{s-post}}
-{q,n:[I\And~g, I\And (f \Or~ q=<>)]}\\
+{\textbf{s-post} justified above in Sect.~\ref{sec:invariant}}
+{q,n,v,f:[I\And~g, I\And (f \Or~ q=<>)]}\\
 %
 \refstep{\textbf{\WHILE}} 
 {
   \WHILE~n \neq 0 \And \Not f ~\DO\\
-      &\qquad \nt{q,n:[I\And~n\ne~0\And\Not~f, I]}{(7)}\\
+      &\qquad \nt{q,n,v,f:[I\And~n\ne~0\And\Not~f, I]}{(7)}\\
   &\OD
  }\\  
 %
  \lrefstep{(7)}
  {\textbf{i-loc}}
- {\VAR~tmp\cdot{}\nt{tmp,q,n:[I\And~n\ne~0\And\Not~f, I]}{(8)}}\\
+ {\VAR~tmp\cdot{}\nt{tmp,q,n,v,f:[I\And~n\ne~0\And\Not~f, I]}{(8)}}\\
 %
  \lrefstep{(8)}
- {\textbf{seq}}
- {\nt{tmp,n,q:[g\And~I\And~q=<z,qt>, q=qt\And tmp=z]}{(a)}\\
- &;\nt{tmp,n,q:[q=qt\And tmp=z, I]}{(b)}}\\
+ {\textbf{seq} no initial variables}
+ {\nt{tmp,q,n,v,f:[n\ne~0\And\Not~f\And~I\And~q=<z,qt>, \Not~f\And~q=qt\And tmp=z]}{(a)}\\
+ &;\nt{tmp,q,n,v,f:[q=qt\And tmp=z, I]}{(b)}}\\
 %
  \lrefstep{(b)}
  {\textbf{if}}
  {\IF~k_t(tmp) = k~\THEN\\
- &\qquad~\nt{f,v:[\NOT~f\And k_t(tmp) = k, I]}{(c)}\\
+ &\qquad~\nt{tmp,q,n,v,f:[\NOT~f\And k_t(tmp) = k, I]}{(c)}\\
  &\ELSE\\
- &\qquad \nt{[k_t(tmp) \ne k, I]}{(d)}\\
+ &\qquad \nt{tmp,q,n,v,f:[k_t(tmp) \ne k, I]}{(d)}\\
  &\FI}\\
 %
 \lrefstep{(a)}
-{\textbf{ass}}
+{\textbf{\deq}}
 {tmp \Ass \deq(q,n)}\\
 \end{align*}
 %
@@ -267,17 +190,104 @@ Now make the fifth line of the invariant true assign\\ $\lambda_t(tmp) = v$ such
 &v = \lambda_t(tmp)}\\
 %
 \end{align*}
-Because $tmp$ is not the node we are looking for, we now have to make sure the conditions of the invariant are met. The invariant tells us that $q$ contains up-to two levels of the tree at any given time. We also know that since $tmp$ has been $\deq$ from $q$, $tmp \notin q$, hence the end of the 5th line of the invariant tells us that the children of all the nodes that are on the current level but not in $q$ must be a subset of $q$, therefore all the children of $tmp$ have to be added to $q$ to meet the invariant\\
+Because $tmp$ is not the node we are looking for, we now have to make sure the conditions of the invariant are met. The invariant tells us that $q$ contains up-to two levels of the tree at any given time. We also know that since $tmp$ has been $\deq$ from $q$, $tmp \notin q$, hence the end of the 5th line of the invariant tells us that the children of all the nodes that are on the current level but not in $q$ must be a subset of $q$, therefore all the children of $tmp$ have to be added to $q$ to meet the invariant.\\
+We do this by looping through the set of successors and $\enq$ them to $q$.\\
 \begin{align*}
     \lrefstep{(d)}
     {\textbf{...}}
-    {\WHILE~m \ne \emptyset~\DO\\
-    &\qquad\VAR~c:\in~m\\
-    &\qquad\enq(q,c)\\
-    &\qquad n \Ass n+1\\
-    &\qquad m\Ass m\backslash\{c\}\\
+    {\VAR~m\Ass\Gamma_t(tmp);\\
+    &\WHILE~m \ne \emptyset~\DO\\
+    &\qquad\VAR~c:\in~m;\\
+    &\qquad\enq(q,c);\\
+    &\qquad n \Ass n+1;\\
+    &\qquad m\Ass m\backslash\{c\};\\
     &\OD\\}
 \end{align*}
+%
+\section{Coupling Invariant}
+\label{sec:coupling_invariant}
+We do the data refinement to take the abstract queue to a more concrete representation using circular buffer, that is an array \textit{r} of  \textit{N+1} cells and two counters \textit{h} and \textit{t} for which \textit{h} = 0 and \textit{t} = -1 when \textit{r} is empty, otherwise \textit{h mod (N+1)} and \textit{t mod (N+1)}  the head and tail indexs of \textit{r} which represents the head and tail of the queue.\\
+%
+Using the Reynolds method, the coupling invariant would be:\\
+\begin{align*}
+  &C: Q(V_t) \times V^*_t \times \mathbb{N}\times \mathbb{Z}  &\to & \mathbb{B}\\
+  &C(<>,r,h,t)  &=  &(t - h+1 = 0)\\
+  &C(<q,x>,r,h,t) &= &(r[t\mod (N+1)]=x \And C(q,r,h,t))\\
+  &C(<x,q>,r,h,t) &= &(x = r[h\mod (N+1)] \And C(q,r,h,t))
+\end{align*}
+For $\ini$ operations:\\
+\begin{align*}
+  &\nt{q,r,h,t:[\True, q=<> \And C(<>,r,h,t)]}{(I_1)}\\\\
+%
+  \lrefstep{(I_1)}
+  {\textbf{sc, c-frame...}} 
+  {
+     \nt{q:[\True,q=<>] }{(I_2)}\\
+     &;\nt{r,h,t:[q=<>, q=<> \And C(<>,r,h,t)]] }{(I_3)}
+   }\\    
+%   
+  \lrefstep{(I_2)}
+  {\textbf{\ini}} 
+  {
+     q:=<> 
+   }\\   
+%   
+  \lrefstep{(I_3)}
+  {\textbf{ass}} 
+  {
+     h := 0 ;~t := -1
+   }\\    
+\end{align*}
+%
+For $\enq$ operations:\\
+\begin{align*}
+  &\nt{q,r,h,t:[ C(q,r,h,t), q=<q_0, x> \And C(q,r,h,t)]}{(E_1)}\\\\
+%
+  \lrefstep{(E_1)}
+  {\textbf{sc, c-frame...}} 
+  {
+    \CON~Q;\\
+     &\nt{q:[C(Q,r,h,t) \And q = Q, q=<Q,x>\And C(Q,r,h,t)] }{(E_2)}\\
+     &;\nt{r,t:[ q=<Q,x>\And C(Q,r,h,t),  q=<Q,x>\And C(q,r,h,t)] }{(E_3)}\\
+   }\\    
+%   
+  \lrefstep{(E_2)}
+  {\textbf{\enq}} 
+  {
+     \enq(q,x) 
+   }\\   
+%   
+  \lrefstep{(E_3)}
+  {\textbf{ass}} 
+  {
+     t = t+1 ;~r[t \mod (N+1)] = x
+   }\\   
+\end{align*}
+%
+For $\deq$ operations:\\
+\begin{align*}
+  &\nt{x,q,r,h,t:[q=<a,b>\And C(q,r,h,t),x=a \And q=b \And C(q,r,h,t)]}{(D_1)}\\\\
+%
+  \lrefstep{(D_1)}
+  {\textbf{sc, c-frame,w-pre...}} 
+  {
+     \nt{q,x:[q=<a,b>\And C(q,r,h,t), x=a \And q=b \And C(<a,b>,r,h,t) }{(D_2)}\\
+     &;\nt{r,h,x:[q=b \And C(<a,b>,r,h,t),  x=a \And q=b \And C(q,r,h,t)] }{(D_3)}\\
+   }\\    
+%   
+  \lrefstep{(D_2)}
+  {\textbf{\enq}} 
+  {
+     x=\deq(q) 
+   }\\   
+%   
+  \lrefstep{(D_3)}
+  {\textbf{ass}} 
+  {
+    x = r[h \mod (N+1)];~h = h+1
+   }\\   
+\end{align*}
+\break
 %
 \section{Code}
 \label{sec:code}
