@@ -15,7 +15,7 @@ void search (Tree root, unsigned int N, Key key, T *val, RetVal *found) {
     int n = 0;
     *found = Failure;
     //(5)-(6)
-    if (root = null)return;
+    if (root == NULL)return;
     t++; 
     r[t % (N+1)] = root;
     //(7)
@@ -36,7 +36,7 @@ void search (Tree root, unsigned int N, Key key, T *val, RetVal *found) {
         } else {
         	//(8)(d)
             // else add all the children of the tmp tree.
-            List *m = tmp->list;
+            List m = tmp->list;
             while (m != NULL) {
             	Tree c = m->n;
                 t++;
