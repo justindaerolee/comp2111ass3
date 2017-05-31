@@ -52,26 +52,26 @@ We do the data refinement to take the abstract queue to a more concrete represen
 %
 Using the Reynolds method, the coupling invariant would be:\\
 \begin{align*}
-	&C: Q(V_t) \times V^*_t \times \mathbb{N}  &\to & \mathbb{B}\\
+	&C: Q(V_t) \times V^*_t \times \mathbb{N}\times \mathbb{Z}  &\to & \mathbb{B}\\
 	&C(<>,r,h,t)  &=  &(t - h+1 = 0)\\
 	&C(<q,x>,r,h,t) &= &(r[t\mod (N+1)]=x \And C(q,r,h,t))\\
 	&C(<x,q>,r,h,t) &= &(x = r[h\mod (N+1)] \And C(q,r,h,t))
 \end{align*}
 For $\ini$ operations:\\
 \begin{align*}
-	 &\nt{q,r,h,t:[\True, q=<> \And C(<>,r,h,t)]}{(I_1)}\\
+	&\nt{q,r,h,t:[\True, q=<> \And C(<>,r,h,t)]}{(I_1)}\\\\
 %
 	\lrefstep{(I_1)}
-	{\textbf{seq}} 
+	{\textbf{sc, c-frame...}} 
 	{
  		 \nt{q:[\True,q=<>] }{(I_2)}\\
- 		 &;\nt{r,h,t:[q=<>, q=<> \And C(<>,r,h,t)]] }{(I_3)}\\
+ 		 &;\nt{r,h,t:[q=<>, q=<> \And C(<>,r,h,t)]] }{(I_3)}
 	 }\\    
 %   
 	\lrefstep{(I_2)}
 	{\textbf{\ini}} 
 	{
- 		 q:=<> \\
+ 		 q:=<> 
 	 }\\   
 %   
 	\lrefstep{(I_3)}
@@ -79,6 +79,55 @@ For $\ini$ operations:\\
 	{
  		 h := 0 ;~t := -1
 	 }\\    
+\end{align*}
+%
+For $\enq$ operations:\\
+\begin{align*}
+	&\nt{q,r,h,t:[ C(q,r,h,t), q=<q_0, x> \And C(q,r,h,t)]}{(E_1)}\\\\
+%
+	\lrefstep{(E_1)}
+	{\textbf{sc, c-frame...}} 
+	{
+		\CON~Q;\\
+ 		 &\nt{q:[C(Q,r,h,t) \And q = Q, q=<Q,x>\And C(Q,r,h,t)] }{(E_2)}\\
+ 		 &;\nt{r,t:[ q=<Q,x>\And C(Q,r,h,t),  q=<Q,x>\And C(q,r,h,t)] }{(E_3)}\\
+	 }\\    
+%   
+	\lrefstep{(E_2)}
+	{\textbf{\enq}} 
+	{
+ 		 \enq(q,x) 
+	 }\\   
+%   
+	\lrefstep{(E_3)}
+	{\textbf{ass}} 
+	{
+ 		 t = t+1 ;~r[t \mod (N+1)] = x
+	 }\\   
+\end{align*}
+%
+For $\deq$ operations:\\
+\begin{align*}
+	&\nt{x,q,r,h,t:[q=<a,b>\And C(q,r,h,t),x=a \And q=b \And C(q,r,h,t)]}{(D_1)}\\\\
+%
+	\lrefstep{(D_1)}
+	{\textbf{sc, c-frame,w-pre...}} 
+	{
+ 		 \nt{q,x:[q=<a,b>\And C(q,r,h,t), x=a \And q=b \And C(<a,b>,r,h,t) }{(D_2)}\\
+ 		 &;\nt{r,h,x:[q=b \And C(<a,b>,r,h,t),  x=a \And q=b \And C(q,r,h,t)] }{(D_3)}\\
+	 }\\    
+%   
+	\lrefstep{(D_2)}
+	{\textbf{\enq}} 
+	{
+ 		 x=\deq(q) 
+	 }\\   
+%   
+	\lrefstep{(D_3)}
+	{\textbf{ass}} 
+	{
+ 		x = r[h \mod (N+1)];~h = h+1
+	 }\\   
 \end{align*}
 \break
 \section{The Derivation}
@@ -219,7 +268,6 @@ Now make the fifth line of the invariant true assign\\ $\lambda_t(tmp) = v$ such
 %
 \end{align*}
 Because $tmp$ is not the node we are looking for, we now have to make sure the conditions of the invariant are met. The invariant tells us that $q$ contains up-to two levels of the tree at any given time. We also know that since $tmp$ has been $\deq$ from $q$, $tmp \notin q$, hence the end of the 5th line of the invariant tells us that the children of all the nodes that are on the current level but not in $q$ must be a subset of $q$, therefore all the children of $tmp$ have to be added to $q$ to meet the invariant\\
-
 \begin{align*}
     \lrefstep{(d)}
     {\textbf{...}}
@@ -236,12 +284,15 @@ Because $tmp$ is not the node we are looking for, we now have to make sure the c
 Putting the code together we have
 \begin{align}
     &\textcolor{red}{\VAR~q\Ass\langle\rangle}\\
+    &\textcolor{blue}{\VAR~r:V^*_t; \VAR~h:\mathbb{N}\Ass 0; \VAR~t:\mathbb{Z}\Ass -1}\\
     &\VAR~n:\mathbb{N}\Ass 0\\
     &f\Ass \False\\
     &\textcolor{red}{\enq(q,r_t)}\\
+    &\textcolor{blue}{t\Ass t+1;~r[t \mod (N+1)]\Ass r_t}\\
     &n\Ass 1\\
     &\WHILE~n \ne 0\And \Not f~\DO\\
     &\textcolor{red}{\qquad \VAR~tmp\Ass \deq(q,n)}\\
+    &\qquad\textcolor{blue}{tmp\Ass r[h \mod (N+1);~h\Ass h+1}\\
     &\qquad n\Ass n-1\\
     &\qquad \IF~k_t(tmp) = k~\THEN\\
     &\qquad\qquad f\Ass \True\\
@@ -251,13 +302,14 @@ Putting the code together we have
     &\qquad\qquad\WHILE~m \ne \emptyset~\DO\\
     &\qquad\qquad\qquad\VAR~c:\in~m\\
     &\textcolor{red}{\qquad\qquad\qquad\enq(q,c)}\\
+    &\qquad\qquad\qquad\textcolor{blue}{t\Ass t+1;~r[t \mod (N+1)]\Ass c}\\
     &\qquad\qquad\qquad n \Ass n+1\\
     &\qquad\qquad\qquad m\Ass m\backslash\{c\}\\
     &\qquad\qquad\OD\\
     &\qquad\FI\\
     &\OD
 \end{align}
-Text in \textcolor{red}{red} are abstract queue operations.\\
+Text in \textcolor{red}{red} are abstract queue operations. We complete the data refinement by replacing \textcolor{red}{red} lines with \textcolor{blue}{blue} lines\\
 \section{MAYBE RUBBISH}
 \label{sec:rubbish}
 include that children of tmp do not exist in q in precondition\\
