@@ -35,16 +35,16 @@ Firstly we define a queue, and operations on abstract queues, which we eliminate
 Therefore the queue holds a natural number that describes the Maximum number of nodes it can hold and zero or more nodes.\\
 We define the following queue operation:\\
 \textbf{initialise:} initialise a queue that can hold up to \textit{N} elements to the empty queue value.
-\begin{align*}
-  &\ini\qquad~q :[\True, q = (N,\epsilon)] \isrefinedby q\Ass\ini(N)
+\begin{align*} 
+  \ini\qquad~q :[\True, q = (N,\epsilon)] \isrefinedby q\Ass\ini(N)
 \end{align*}
 \textbf{\enq:} adds an item to a queue if there's a space available 
 \begin{align*}
-  &\enq\qquad q:[q=(N,s)\And |s| < N, q=(N,sx)]\isrefinedby \enq(q,x)
+  \enq\qquad q:[q=(N,s)\And |s| < N, q=(N,sx)]\isrefinedby \enq(q,x)
 \end{align*}
 \textbf{\deq:} return the oldest item in the queue and remove it form the queue\\
 \begin{align*}
-  &\deq\qquad q,y:[q = (N,xs), y = x \And q = q_0] \isrefinedby y \Ass \deq(q) 
+  \deq\qquad q,y:[q = (N,xs), y = x \And q = q_0] \isrefinedby y \Ass \deq(q) 
 \end{align*}
 %
 \section{The Derivation}
@@ -125,8 +125,8 @@ Since the invariant says that $n$ represents the size of q (the number of nodes)
 \lrefstep{(3)}
 {\textbf{seq} no initial variables} 
 {
-  \nt{q,n,v,f:[\pre(3), \pre(3)\And q=<>] }{(5)}\\
-  &;\nt{q,n,v,f:[\pre(3)\And q=<>,I] }{(6)}\\
+  \nt{q,n,v,f:[\pre(3), \pre(3)\And q=(N,\epsilon)] }{(5)}\\
+  &;\nt{q,n,v,f:[\pre(3)\And q=(N,\epsilon),I] }{(6)}\\
  }     
 %
 \end{align*}
@@ -166,15 +166,15 @@ We then derive code by initialising $f$ to $\False$ and $\enq$ the root node to 
 %
  \lrefstep{(8)}
  {\textbf{seq} no initial variables}
- {\nt{tmp,q,n,v,f:[n\ne~0\And\Not~f\And~I\And~q=<z,qt>,q = (N, xy)\And I\subst{s}{tmp}\subst{(N,xy)}{(N,y)}\And\Not f]}{(a)}\\
- &;\nt{tmp,q,n,v,f:[q = (N, xy)\And I\subst{s}{tmp}\subst{(N,xy)}{(N,y)}\And\Not f, I]}{(b)}}\\
+ {\nt{tmp,q,n,v,f:[n\ne~0\And\Not~f\And~I\And~q = (N, xy),q = (N, y)\And I\subst{s}{tmp}\subst{(N,xy)}{(N,y)}\And\Not f]}{(a)}\\
+ &;\nt{tmp,q,n,v,f:[q = (N, y)\And I\subst{s}{tmp}\subst{(N,xy)}{(N,y)}\And\Not f, I]}{(b)}}\\
 %
  \lrefstep{(b)}
  {\textbf{if}}
  {\IF~k_t(tmp) = k~\THEN\\
- &\qquad~\nt{tmp,q,n,v,f:[q = (N, xy)\And I\subst{s}{tmp}\subst{(N,xy)}{(N,y)}\And\Not f\And k_t(tmp) = k, I]}{(c)}\\
+ &\qquad~\nt{tmp,q,n,v,f:[q = (N, y)\And I\subst{s}{tmp}\subst{(N,xy)}{(N,y)}\And\Not f\And k_t(tmp) = k, I]}{(c)}\\
  &\ELSE\\
- &\qquad \nt{tmp,q,n,v,f:[q = (N, xy)\And I\subst{s}{tmp}\subst{(N,xy)}{(N,y)}\And\Not f\And k_t(tmp) \ne k, I]}{(d)}\\
+ &\qquad \nt{tmp,q,n,v,f:[q = (N, y)\And I\subst{s}{tmp}\subst{(N,xy)}{(N,y)}\And\Not f\And k_t(tmp) \ne k, I]}{(d)}\\
  &\FI}\\
 %
 \lrefstep{(a)}
@@ -198,7 +198,7 @@ We do this by looping through the set of successors and $\enq$ them to $q$.\\
 %
 \\
 \\
-\begin{align*}
+\begin{align*} 
     \lrefstep{(d)}
     {\textbf{...}}
     {\VAR~m\Ass\Gamma_t(tmp);\\
@@ -215,27 +215,27 @@ We do this by looping through the set of successors and $\enq$ them to $q$.\\
 We do the data refinement to take the abstract queue to a more concrete representation using circular buffer, that is an array \textit{r} of  \textit{N+1} cells and two counters \textit{h} and \textit{t} for which \textit{h} = 0 and \textit{t} = -1 when \textit{r} is empty, otherwise \textit{h mod (N+1)} and \textit{t mod (N+1)}  the head and tail indexs of \textit{r} which represents the head and tail of the queue.\\
 %
 Using the Reynolds method, the coupling invariant would be:\\
-\begin{align*}
+\begin{align*} 
   &C: Q(V_t) \times V^*_t \times \mathbb{N}\times \mathbb{Z}  &\to & \mathbb{B}\\
-  &C(<>,r,h,t)  &=  &(t - h+1 = 0)\\
-  &C(<q,x>,r,h,t) &= &(r[t\mod (N+1)]=x \And C(q,r,h,t))\\
-  &C(<x,q>,r,h,t) &= &(x = r[h\mod (N+1)] \And C(q,r,h,t))
+  &C( (N,\epsilon),r,h,t)  &=  &(t - h+1 = 0)\\
+  &C(q=(N,sx),r,h,t) &= &(r[t\mod (N+1)]=x \And C(q,r,h,t))\\
+  &C(q=(N,xs),r,h,t) &= &(x = r[h\mod (N+1)] \And C(q,r,h,t))
 \end{align*}
 For $\ini$ operations:\\
-\begin{align*}
-  &\nt{q,r,h,t:[\True, q=<> \And C(<>,r,h,t)]}{(I_1)}\\\\
+\begin{align*} 
+  &\nt{q,r,h,t:[\True, q=(N,\epsilon) \And C((N,\epsilon),r,h,t)]}{(I_1)}\\\\
 %
   \lrefstep{(I_1)}
   {\textbf{sc, c-frame...}} 
   {
-     \nt{q:[\True,q=<>] }{(I_2)}\\
-     &;\nt{r,h,t:[q=<>, q=<> \And C(<>,r,h,t)]] }{(I_3)}
+     \nt{q:[\True,q=(N,\epsilon)] }{(I_2)}\\
+     &;\nt{r,h,t:[q=(N,\epsilon), q=(N,\epsilon) \And C((N,\epsilon),r,h,t)]] }{(I_3)}
    }\\    
 %   
   \lrefstep{(I_2)}
   {\textbf{\ini}} 
   {
-     q:=<> 
+     q:=(N,\epsilon)
    }\\   
 %   
   \lrefstep{(I_3)}
@@ -247,14 +247,14 @@ For $\ini$ operations:\\
 %
 For $\enq$ operations:\\
 \begin{align*}
-  &\nt{q,r,h,t:[ C(q,r,h,t), q=<q_0, x> \And C(q,r,h,t)]}{(E_1)}\\\\
+  &\nt{q,r,h,t:[ C(q,r,h,t), q=(N, sx) \And C(q,r,h,t)]}{(E_1)}\\\\
 %
   \lrefstep{(E_1)}
   {\textbf{sc, c-frame...}} 
   {
     \CON~Q;\\
-     &\nt{q:[C(Q,r,h,t) \And q = Q, q=<Q,x>\And C(Q,r,h,t)] }{(E_2)}\\
-     &;\nt{r,t:[ q=<Q,x>\And C(Q,r,h,t),  q=<Q,x>\And C(q,r,h,t)] }{(E_3)}\\
+     &\nt{q:[C(Q,r,h,t) \And q = Q = (N,s), q=(N,sx)\And C(Q,r,h,t)] }{(E_2)}\\
+     &;\nt{r,t:[ q=(N,sx)\And C(Q,r,h,t),  q=(N,sx)\And C(q,r,h,t)] }{(E_3)}\\
    }\\    
 %   
   \lrefstep{(E_2)}
@@ -268,17 +268,17 @@ For $\enq$ operations:\\
   {
      t = t+1 ;~r[t \mod (N+1)] = x
    }\\   
-\end{align*}
+\end{align*} 
 %
 For $\deq$ operations:\\
-\begin{align*}
-  &\nt{x,q,r,h,t:[q=<a,b>\And C(q,r,h,t),x=a \And q=b \And C(q,r,h,t)]}{(D_1)}\\\\
-%
+\begin{align*} 
+  &\nt{x,q,r,h,t:[q=(N,ab)\And C(q,r,h,t),x=a \And q=(N,b) \And C(q,r,h,t)]}{(D_1)}\\\\
+% 
   \lrefstep{(D_1)}
   {\textbf{sc, c-frame,w-pre...}} 
   {
-     \nt{q,x:[q=<a,b>\And C(q,r,h,t), x=a \And q=b \And C(<a,b>,r,h,t) }{(D_2)}\\
-     &;\nt{r,h,x:[q=b \And C(<a,b>,r,h,t),  x=a \And q=b \And C(q,r,h,t)] }{(D_3)}\\
+     \nt{q,x:[q=(N,ab)\And C(q,r,h,t), x=a \And q=(N,b) \And C((N,ab),r,h,t) }{(D_2)}\\
+     &;\nt{r,h,x:[q=(N,b) \And C((N,ab),r,h,t),  x=a \And q=(N,b) \And C(q,r,h,t)] }{(D_3)}\\
    }\\    
 %   
   \lrefstep{(D_2)}
