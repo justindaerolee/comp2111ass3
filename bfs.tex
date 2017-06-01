@@ -28,25 +28,23 @@
 The derivation of $\bfs$ on a tree using a bounded $\qu$.\\ 
 %
 %---following are queue operation
-Firstly we extend the toy language with queues and queue operations, and operations on abstract queues, which we eliminate later with data refinement. 
+Firstly we define a queue, and operations on abstract queues, which we eliminate later with data refinement.
 \begin{align*}
-    &Q(\tau) ::= \langle\rangle\qquad\text{(empty queue)}\\
-    &|\qquad\langle~x,t~\rangle\qquad\text{where $x\in\tau$ and $t\in~Q(\tau)$}\\
-    &|\qquad\langle~t,x~\rangle\\
+    &Q= \mathbb{N}\times V^*_t
 \end{align*}
+Therefore the queue holds a natural number that describes the Maximum number of nodes it can hold and zero or more nodes.\\
 We define the following queue operation:\\
 \textbf{initialise:} initialise a queue that can hold up to \textit{N} elements to the empty queue value.
 \begin{align*}
-  &\ini\qquad~q :[\True, q = \langle\rangle] \isrefinedby q\Ass \langle\rangle
+  &\ini\qquad~q :[\True, q = (N,\epsilon)] \isrefinedby q\Ass\ini(N)
 \end{align*}
 \textbf{\enq:} adds an item to a queue if there's a space available 
 \begin{align*}
-  &\enq\qquad q:[\True, q=\langle q_0,x\rangle]\isrefinedby \enq(q,x)
+  &\enq\qquad q:[q=(N,s)\And |s| < N, q=(N,sx)]\isrefinedby \enq(q,x)
 \end{align*}
 \textbf{\deq:} return the oldest item in the queue and remove it form the queue\\
 \begin{align*}
- %   &\deq\qquad n,q:[n>0\And q=\langle s,qp\rangle\And q\ne~\langle\rangle, s= s_0\And q = qp] \isrefinedby qp \Ass \deq(q) 
-  &\deq\qquad q,x:[q = <a,b>, x = a \And q = b] \isrefinedby x \Ass \deq(q) 
+  &\deq\qquad q,y:[q = (N,xs), y = x \And q = q_0] \isrefinedby y \Ass \deq(q) 
 \end{align*}
 %
 \section{The Derivation}
@@ -62,6 +60,7 @@ We define the following queue operation:\\
     \end{array}
   \right]}{(1)}\\
 %
+\\
   \lrefstep{(1)}
   {\textbf{c-frame}}
   {v,f:\left[
@@ -87,10 +86,11 @@ We define the following queue operation:\\
 \begin{align*}
     &I = \left(
     \begin{array}{l}
-         \exists j\in \mathbb{N}\cdot{}(\forall~i<j\cdot{}\forall~x \in \Gamma^{i}(r_t)\cdot{}K_t(x) \ne k)\\
-         \And 0\leq~n\leq~N\And \exists~l\in[0,n-1] \cdot{}q[0..l] \subseteq \Gamma^j_t(r_t)\\
-         \And q[l+1..n-1] \subseteq \Gamma^{j+1}_t(r_t)\\
-         \And (\forall y\in V_t(y\in \Gamma^{*}_{t}(r_t)\And y \notin\Gamma^{+}_{t}(y)))\\
+         \exists j\in \mathbb{N}\cdot{}(\forall~i<j\cdot{}\forall~x \in \Gamma^{i}_t(r_t)\cdot{}K_t(x) \ne k)\\
+         \And~0\leq~n\leq~N\And \exists~l\in[0,n-1] \cdot{}q = (N,w_0..w_l..w_{n-1})\\
+         \And~w_0..w_l\subseteq\Gamma^j_t(r_t)\\
+         \And~w_{l+1}..w_{n-1} \subseteq \Gamma^{j+1}_t(r_t)\And n = |w_0..w_{n-1}|\\
+         \And (\forall y\in V_t(y\in \Gamma^{*}_{t}(r_t)\And y \notin\Gamma^{+}_{t}(y)))\And\max_{i\in\mathbb{N}}|\Gamma_t^{i}(r_t)\cup\Gamma_{t}^{i+1}(r_t)|\leq N\\
          \And ((f\And\exists~s\in \Gamma^{j}_{t}(r_t)\cdot{}k_t(s) = k\And \lambda_t(s) = v\And s\notin q)\\
          \Or (\Not~f \And \forall~p \in \Gamma^j_t(r_t) \And p\notin~q \And k_t(p) \ne k \And \Gamma_t(p) \subseteq q))
     \end{array}
@@ -100,15 +100,16 @@ $j$ is defined as a node's distance from the root node, or the level of that nod
 %
 The first line of the invariant shows that all previous levels of the tree before the current level has been visited and the key was not found.\\
 the second line and third line of the invariant show that the queue, $q$ is composed of at most only two levels of the tree at any given time, $j$ (being defined at the current level) and $j+1$.\\
-The fifth line of the invariant says that if $f$ then for some node on the current level there exists the node we are looking for.\\
-The sixth line says all current level nodes that are not in $q$, are not the nodes we are looking for and their children are a subset of q.\\
+The sixth line of the invariant says that if $f$ then for some node on the current level there exists the node we are looking for.\\
+The seventh line says all current level nodes that are not in $q$, are not the nodes we are looking for and their children are a subset of q.\\
 \\
-Since $0\leq~n\leq~N$, and $n$ is described as the length of the queue\\ $\max_{i\in\mathbb{N}}|\Gamma_t^{i}(r_t)\cup\Gamma_{t}^{i+1}(r_t)|\leq N$, of the precondition implies the second and third line of the invariant. Showing that $n$ the length of the queue cannot exceed the number of nodes of two consecutive levels of the tree, hence $n\leq~N$, $N$ representing the number of nodes of the last two levels of the tree.\\
+Since $0\leq~n\leq~N$, and $n$ is described as the length of the queue.\\ $\max_{i\in\mathbb{N}}|\Gamma_t^{i}(r_t)\cup\Gamma_{t}^{i+1}(r_t)|\leq N$, of the precondition implies the second and third line of the invariant. Showing that $n$ the length of the queue cannot exceed the number of nodes of two consecutive levels of the tree, hence $n\leq~N$, $N$ representing the largest number of nodes of two levels of the tree.\\
 The invariant also contains the fact that all nodes are connected as a tree data structure, identical to that in the precondition.\\
 \\
-$I\And(f\Or~n=0)$, When $f=\True$ the invariant describes that some node,\\ $s\in\Gamma^j_t(r_t)\cdot{}k_t(s) = k\And \lambda_t(s) = v\And s\notin q$, which implies the post condition in the scenario that $f = \True$\\
+$I\And(f\Or~n=0)$, When $f=\True$ the second last line of the invariant describes that some node,\\ $s\in\Gamma^j_t(r_t)\cdot{}k_t(s) = k\And \lambda_t(s) = v\And s\notin q$, which implies the post condition in the scenario that $f = \True$\\
 In the case that $f=\False\And~n=0$ the first and last line of the invariant shows that all nodes previous to current level have been checked.\\ Since the queue is empty all nodes on the current level have also been checked implying that none of the nodes in the tree contain the key that we are looking for,\\ implying the post condition in the scenario that $n=0$.\\
 Therefore $I\And(f\Or~n=0)$ implies the post condition\\
+Since the invariant says that $n$ represents the size of q (the number of nodes) we will increment n whenever $\enq$ is done or decrement n whenever $\deq$ is done such that the invariant is true at the beginning and end of the while loop.
 %---
 \break
 \section{The Derivation continued ...}
@@ -124,32 +125,33 @@ Therefore $I\And(f\Or~n=0)$ implies the post condition\\
 \lrefstep{(3)}
 {\textbf{seq} no initial variables} 
 {
-  \nt{q,n,v,f:[\pre(3), \pre(3)\And q=<>\And \Not f] }{(5)}\\
-  &;\nt{q,n,v,f:[\pre(3)\And q=<>\And \Not f,I] }{(6)}\\
- }\\      
+  \nt{q,n,v,f:[\pre(3), \pre(3)\And q=<>] }{(5)}\\
+  &;\nt{q,n,v,f:[\pre(3)\And q=<>,I] }{(6)}\\
+ }     
 %
 \end{align*}
 %
-We derive code by initialising $f$ to $\False$ and $\enq$ the root node to establish our invariant initially.
+First we introduce $q : Q$ which will allow us to implement $\bfs$.\\ 
+We then derive code by initialising $f$ to $\False$ and $\enq$ the root node to establish our invariant initially.
 %
 \begin{align*}
 \lrefstep{(5)}
-{\textbf{ass}} 
+{\textbf{i-loc}} 
 {
-  q \Ass initialise();\\
-  &f \Ass \False\\
+  \VAR~q:Q \Ass initialise(N)
  }\\      
 %
 \lrefstep{(6)}
-{\textbf{ass}} 
+{\textbf{seq, ass, \enq, ass}} 
 {
-  \enq(q,r_t);\\
+  f \Ass \False;\\
+  &\enq(q,r_t);\\
   & n \Ass 1\\
 }\\
 %
 \lrefstep{(4)}
 {\textbf{s-post} justified above in Sect.~\ref{sec:invariant}}
-{q,n,v,f:[I\And~g, I\And (f \Or~ q=<>)]}\\
+{q,n,v,f:[I\And~g, I\And (f \Or~ n=0)]}\\
 %
 \refstep{\textbf{\WHILE}} 
 {
@@ -164,34 +166,38 @@ We derive code by initialising $f$ to $\False$ and $\enq$ the root node to estab
 %
  \lrefstep{(8)}
  {\textbf{seq} no initial variables}
- {\nt{tmp,q,n,v,f:[n\ne~0\And\Not~f\And~I\And~q=<z,qt>, \Not~f\And~q=qt\And tmp=z]}{(a)}\\
- &;\nt{tmp,q,n,v,f:[q=qt\And tmp=z, I]}{(b)}}\\
+ {\nt{tmp,q,n,v,f:[n\ne~0\And\Not~f\And~I\And~q=<z,qt>,q = (N, xy)\And I\subst{s}{tmp}\subst{(N,xy)}{(N,y)}\And\Not f]}{(a)}\\
+ &;\nt{tmp,q,n,v,f:[q = (N, xy)\And I\subst{s}{tmp}\subst{(N,xy)}{(N,y)}\And\Not f, I]}{(b)}}\\
 %
  \lrefstep{(b)}
  {\textbf{if}}
  {\IF~k_t(tmp) = k~\THEN\\
- &\qquad~\nt{tmp,q,n,v,f:[\NOT~f\And k_t(tmp) = k, I]}{(c)}\\
+ &\qquad~\nt{tmp,q,n,v,f:[q = (N, xy)\And I\subst{s}{tmp}\subst{(N,xy)}{(N,y)}\And\Not f\And k_t(tmp) = k, I]}{(c)}\\
  &\ELSE\\
- &\qquad \nt{tmp,q,n,v,f:[k_t(tmp) \ne k, I]}{(d)}\\
+ &\qquad \nt{tmp,q,n,v,f:[q = (N, xy)\And I\subst{s}{tmp}\subst{(N,xy)}{(N,y)}\And\Not f\And k_t(tmp) \ne k, I]}{(d)}\\
  &\FI}\\
 %
 \lrefstep{(a)}
 {\textbf{\deq}}
-{tmp \Ass \deq(q,n)}\\
+{tmp \Ass \deq(q,n);\\
+&n\Ass~n-1}\\
 \end{align*}
 %
 To make the invariant $\True$ if $k_t(tmp) = k$, we have to assign $f \Ass \True$ because the sixth line of the invariant tell us that $f$ cannot be $\False$ when $k_t(tmp) = k$.\\
-Now make the fifth line of the invariant true assign\\ $\lambda_t(tmp) = v$ such that the invariant is $True$.\\
+Now make the fifth line of the invariant true make $\lambda_t(tmp) = v$ using assignment such that the invariant is $True$.
 %
 \begin{align*}
 \lrefstep{(c)}
-{\textbf{ass}}
+{\textbf{seq, ass}}
 {f\Ass \True;\\
 &v = \lambda_t(tmp)}\\
 %
 \end{align*}
 Because $tmp$ is not the node we are looking for, we now have to make sure the conditions of the invariant are met. The invariant tells us that $q$ contains up-to two levels of the tree at any given time. We also know that since $tmp$ has been $\deq$ from $q$, $tmp \notin q$, hence the end of the 5th line of the invariant tells us that the children of all the nodes that are on the current level but not in $q$ must be a subset of $q$, therefore all the children of $tmp$ have to be added to $q$ to meet the invariant.\\
 We do this by looping through the set of successors and $\enq$ them to $q$.\\
+%
+\\
+\\
 \begin{align*}
     \lrefstep{(d)}
     {\textbf{...}}
@@ -288,6 +294,10 @@ For $\deq$ operations:\\
    }\\   
 \end{align*}
 \break
+\\
+\\
+\\
+\\
 %
 \section{Code}
 \label{sec:code}
@@ -320,48 +330,4 @@ Putting the code together we have
     &\OD
 \end{align}
 Text in \textcolor{red}{red} are abstract queue operations. We complete the data refinement by replacing \textcolor{red}{red} lines with \textcolor{blue}{blue} lines\\
-\section{MAYBE RUBBISH}
-\label{sec:rubbish}
-include that children of tmp do not exist in q in precondition\\
-\begin{align*}
-\lrefstep{(d)}
-{\textbf{i-loc}}
-{\VAR~m\cdot{} \nt{[k_t(tmp) \ne k, q= q_0\cdot{}\Gamma~(tmp)]}{(d_1)}}\\
-%
-\lrefstep{(d_1)}
-{\textbf{s-post}}
-{m,tmp,q:[k_t(tmp) \ne k, \Gamma_t(tmp) \subseteq q]}\\
-%
-\refstep
-{\textbf{seq}}
-{\nt{m,q,tmp:[k_t(tmp) \ne k, \Gamma_t(tmp) \subseteq m\cup q]}{(e)}\\
-&\nt{m,tmp,q:[\Gamma_t(tmp) \subseteq m\cup q, \Gamma_t(tmp) \subseteq q]}{(f)}}\\
-%
-\lrefstep{(e)}
-{\textbf{ass}}
-{\VAR~m\Ass\Gamma_t(tmp)}\\
-%
-\lrefstep{(f)}
-{\textbf{\WHILE}}
-{\WHILE~m\ne~\emptyset~\DO\\
-&\qquad~\nt{m,tmp,q:[\Gamma_t(tmp)\subseteq m\cup~q\And m\ne\emptyset,\Gamma_t(tmp)\subseteq m\cup~q]}{(g)}\\
-&\OD}\\
-%
-\lrefstep{(g)}
-{\textbf{i-loc}}
-{\VAR~c\cdot{}\nt{c,m,tmp,q:[\Gamma_t(tmp)\subseteq m\cup~q\And m\ne\emptyset,\Gamma_t(tmp)\subseteq m\cup~q]}{(h)}}\\
-%
-\lrefstep{(h)}
-{\textbf{seq}}
-{c,m,tmp,q:[\Gamma_t(tmp)\subseteq m\cup~q\And m\ne\emptyset,\Gamma_t(tmp)\subseteq m\cup~q]}
-\end{align*}\\
-We prove that the precondition to the procedure search implies the invariant
-\begin{align*}
-    &I\subst{1}{n}\subst{\langle\rangle}{q}\subst{\False}{f}\subst{\langle\rangle}{q}\\
-    &=  \exists j\in \mathbb{N}\cdot{}(\forall~x \in \Gamma^{\forall~i<j}(r_t)\cdot{}K_t(x) \ne k)\\
-    &\And 0\leq~1\leq~N\And\langle\rangle \subseteq \Gamma^0_t(r_t)\\
-    &\And (\forall y\in V_t(y\in \Gamma^{*}_{t}(r_t)\And y \notin\Gamma^{+}_{t}(y)))\\
-    &\And\forall~p \in \Gamma^0_t(r_t) \And p\notin~\langle\rangle \And k_t(p) \ne k)
-\end{align*}\\
-most of the invariant is made redundant by the fact that the q is substituted by an empty set and the because f is substituted by $\False$. The only value that $j$ can be is $0$.\\
 \end{document}
